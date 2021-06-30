@@ -6,14 +6,9 @@ from datetime import datetime, timedelta
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
-# syntax python update_covid_it.py from to (in yyyymmdd)
-# or python update_covid_it.py to (by default, plot the 30 days prior to the input)
-# Input either 'latest' or 'yyyymmdd' for a given day
-
 # Check if user gave a start and stop, or just a stop date
-# If there is just a stop, default to the 30 days before today or given date
-# If there are both a start and stop, the start is the first argument
-if len(sys.argv) == 2: 
+if len(sys.argv) == 2:
+    # If there is just a stop, default to the 30 days before today or given date
     if sys.argv[1] == 'latest':
         date = datetime.now().date()
         today = date.strftime("%Y%m%d")
@@ -21,7 +16,8 @@ if len(sys.argv) == 2:
     else:
         stop = datetime.strptime(sys.argv[1], '%Y%m%d').date() # convert from yyyymmdd string to date
     start = stop-timedelta(days=30)
-else: 
+else:
+    # If there are both a start and stop, the start is the first argument
     start = datetime.strptime(sys.argv[1], '%Y%m%d').date()
     if sys.argv[2] == 'latest':
         date = datetime.now().date()
