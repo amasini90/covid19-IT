@@ -1,6 +1,6 @@
 # covid19-IT
-Code to display the Italian percentage of new covid19 cases for a given timespan, relative to new daily tests. 
-The code will read the data from the official GitHub and compute the percentage of new cases on the fly, along with the weekly rolling average.
+Code to display the Italian percentage of new covid19 cases for a given timespan, relative to new daily tests, as well as the daily variation of people in intensive care unit (ICU) or generally hospitalized with less severe symptoms.
+The code reads the data from the official GitHub of the Italian government and nicely displays the relevant quantities.
 
 # Prerequisites
 * Numpy (`pip install numpy`)
