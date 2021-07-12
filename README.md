@@ -3,9 +3,9 @@ Code to display the Italian percentage of new covid19 cases for a given timespan
 The code will read the data from the official GitHub and compute the percentage of new cases on the fly, along with the weekly rolling average.
 
 # Prerequisites
-* Numpy 
-* Pandas 
-* Datetime
+* Numpy (`pip install numpy`)
+* Pandas (`pip install pandas`)
+* Matplotlib (`pip install matplotlib`)
 
 # Syntax and Usage
 Simply run the script with 
