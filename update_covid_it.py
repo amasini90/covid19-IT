@@ -36,6 +36,7 @@ elif len(sys.argv) > 2: # If there are both a start and stop, the start is the f
 t = np.arange(start, stop+timedelta(days=1), timedelta(days=1)).astype(datetime)
 
 giorni, casi, tamponi = [],[],[]
+icu, hospital = [],[]
 for day in t:
     
     # Convert each day to the correct argument
@@ -58,27 +59,42 @@ for day in t:
     casi.append(np.sum(df["totale_casi"]))
     tamponi.append(np.sum(df["tamponi"]))
 
+    hospital.append(np.sum(df["ricoverati_con_sintomi"]))
+    icu.append(np.sum(df["terapia_intensiva"]))
+
 giorni = np.array(giorni)
+
+# Compute increments of interest
 delta_casi = np.array(list(casi[i+1]-casi[i] for i in range(len(casi)-1)))
 delta_tamponi = np.array(list(tamponi[i+1]-tamponi[i] for i in range(len(tamponi)-1)))
 ratio = (delta_casi/delta_tamponi)*100.
 
+delta_icu = np.array(list(icu[i+1]-icu[i] for i in range(len(icu)-1)))
+delta_hospital = np.array(list(hospital[i+1]-hospital[i] for i in range(len(hospital)-1)))
+
+# Compute the rolling mean at 7 days
 D = pd.Series(ratio, np.arange(len(ratio)))
 d_mva = D.rolling(7).mean()
 average = []
 for i in range(len(d_mva.array)):
     average.append(d_mva.array[i])
 
-ticklabels = [x.strftime("%Y%m%d")[-4:] for x in giorni[1:]]
-newlab = [x[-2:]+'-'+x[:2] for x in ticklabels]
+# Plot the results
+fig, ax = plt.subplots(nrows=2, figsize=[8,5], sharex=True)
+ax[0].plot(giorni[1:], ratio, color='lime', linewidth=2)
+ax[0].plot(giorni[1:], average, color='k', linestyle='dashed', label='Media mobile a 7 giorni')
+ax[0].legend()
+ax[0].set_ylim(bottom=0)
+ax[0].set_ylabel('Incremento casi (%)')
+ax[0].tick_params(direction='in', right=True, top=True)
 
-fig, ax = plt.subplots()
-ax.plot(giorni[1:], ratio, color='lime', linewidth=2)
-ax.plot(giorni[1:], average, color='k', linestyle='dashed')
-ax.set_xlabel('Data')
-ax.set_ylabel('Incremento percentuale di casi (%)')
-ax.set_xticks(giorni[1:])
-ax.set_xticklabels(newlab)
+ax[1].plot(giorni[1:], delta_icu, color='tomato',label='ICU')
+ax[1].plot(giorni[1:], delta_hospital, color='royalblue',label='Ricoverati')
+ax[1].legend()
+ax[1].set_xlabel('Data')
+ax[1].set_ylabel('Incremento ospedalizzati')
+ax[1].tick_params(direction='in', right=True, top=True)
 plt.xticks(rotation=90)
 plt.tight_layout()
+plt.subplots_adjust(hspace=0)
 plt.show()
