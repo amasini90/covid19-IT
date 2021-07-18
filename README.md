@@ -1,5 +1,5 @@
 # covid19-IT
-Code to display the Italian percentage of new covid19 cases for a given timespan, relative to new daily tests, as well as the daily variation of people in intensive care unit (ICU) or generally hospitalized with less severe symptoms.
+Code to display the Italian percentage of new covid19 cases for a given timespan, relative to new daily tests, as well as the number of people in intensive care unit (ICU) or generally hospitalized with less severe symptoms.
 The code reads the data from the official GitHub of the Italian government and nicely displays the relevant quantities.
 
 # Prerequisites
@@ -12,7 +12,7 @@ Simply run the script with
 
 `python update_covid_it.py startdate enddate`,
 
-with dates in format `yyyymmdd`.
+with dates in format `dd/mm/yyyy`.
 If you prefer, you can simply use an end date; the code will plot the 30 days prior to the given date (adjustable in the code).
 The end date can also be passed as "latest", i.e.
 
