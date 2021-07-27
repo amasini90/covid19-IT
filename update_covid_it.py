@@ -7,6 +7,7 @@ from pandas.plotting import register_matplotlib_converters
 from urllib.error import HTTPError
 register_matplotlib_converters()
 import matplotlib.dates as mdates
+from tqdm import tqdm
 myFmt = mdates.DateFormatter('%d/%m')
 
 if len(sys.argv) < 2:
@@ -34,7 +35,7 @@ t = np.arange(start, stop+timedelta(days=1), timedelta(days=1)).astype(datetime)
 
 giorni, casi, tamponi = [],[],[]
 icu, hospital = [],[]
-for day in t:
+for day in tqdm(t):
     
     # Convert each day to the correct argument
     argument = day.strftime("%Y%m%d")
@@ -77,7 +78,7 @@ for i in range(len(d_mva.array)):
     average.append(d_mva.array[i])
 
 # Plot the results
-fig, ax = plt.subplots(nrows=2, figsize=[5,6])
+fig, ax = plt.subplots(nrows=2, figsize=[8,5])
 ax[0].plot(giorni[1:], ratio, color='lime', linewidth=2)
 ax[0].plot(giorni[1:], average, color='k', linestyle='dashed', label='Media mobile a 7 giorni')
 ax[0].legend(loc='best')
@@ -87,11 +88,11 @@ ax[0].tick_params(direction='in', right=True, top=True)
 ax[0].xaxis.set_major_formatter(myFmt)
 ax[0].xaxis.set_ticks_position('top')
 
-ax[1].plot(giorni[1:], delta_icu, color='tomato',label='Terapie intensive')
-ax[1].plot(giorni[1:], delta_hospital, color='royalblue',label='Ricoverati')
+ax[1].plot(giorni[1:], delta_icu/icu[1:], color='tomato',label='Terapie intensive')
+ax[1].plot(giorni[1:], delta_hospital/hospital[1:], color='royalblue',label='Ricoverati')
 ax[1].legend(loc='best')
 ax[1].set_xlabel('Data')
-ax[1].set_ylabel('Variazione')
+ax[1].set_ylabel('Variazione (%)')
 #ax[1].set_yscale('log')
 ax[1].tick_params(axis='both', direction='in', left=True, right=True, bottom=True, top=True)
 ax[1].xaxis.set_major_formatter(myFmt)
