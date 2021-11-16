@@ -9,6 +9,8 @@ register_matplotlib_converters()
 import matplotlib.dates as mdates
 from numerize import numerize
 myFmt = mdates.DateFormatter('%d/%m')
+from matplotlib import rc
+rc('font',**{'family':'serif','serif':['Luminari']})
 
 # Title of the App
 st.title('Covid19 in Italy')
@@ -37,6 +39,14 @@ def get_dates(args=['latest']):
             stop = datetime.strptime(args[1], "%d/%m/%Y").date()
 
     return (start,stop)
+
+def mysign(inp):
+    if np.sign(inp) > 0:
+        return '+'
+    elif np.sign(inp) < 0:
+        return '-'
+    else:
+        return ''
 
 @st.cache
 def load_data_italy():
@@ -106,6 +116,14 @@ def load_data_local(where='Varese'):
   
     return [giorni,casi]
 
+dark = False
+if dark == True:
+    rc('axes',edgecolor='white')
+    switch = 'white'
+else:
+    rc('axes',edgecolor='k')
+    switch = 'k'
+
 start,stop = st.date_input('Selezionare date', value=(datetime.now().date()-timedelta(days=30),datetime.now().date()), min_value=datetime.strptime('01/03/2020', "%d/%m/%Y").date(), max_value=None, key=None, help=None, on_change=None, args=None, kwargs=None)
 
 where = st.text_input('Provincia da visualizzare', value="Varese", max_chars=None, key=None, type="default", help=None, autocomplete=None, on_change=None, args=None, kwargs=None, placeholder=None)
@@ -132,16 +150,6 @@ average = []
 for i in range(len(d_mva.array)):
     average.append(d_mva.array[i])
 
-#return [giorni,ratio,average,perc_delta_hospital,perc_delta_icu]
-
-def mysign(inp):
-    if np.sign(inp) > 0:
-        return '+'
-    elif np.sign(inp) < 0:
-        return '-'
-    else:
-        return ''
-
 st.subheader('Percentuale di tamponi positivi e variazione ospedalizzazioni')
 if stop == datetime.now().date():
     giorno = giorni[-1].strftime("%d/%m/%Y")
@@ -153,22 +161,22 @@ if stop == datetime.now().date():
 
 fig, ax = plt.subplots(nrows=2)
 ax[0].plot(giorni[1:], ratio, color='lime', linewidth=2)
-ax[0].plot(giorni[1:], average, color='k', linestyle='dashed', label='Media mobile a 7 giorni')
+ax[0].plot(giorni[1:], average, color=switch, linestyle='dashed', label='Media mobile a 7 giorni')
 ax[0].legend(loc='best')
 ax[0].set_ylim(bottom=0)
-ax[0].set_ylabel('Incremento casi (%)')
+ax[0].set_ylabel(r'Incremento casi (\%)',fontsize=12)
 ax[0].tick_params(direction='in', right=True, top=True)
 ax[0].xaxis.set_major_formatter(myFmt)
 ax[0].xaxis.set_ticks_position('top')
 
 ax[1].plot(giorni[1:], perc_delta_icu, color='tomato',label='Terapie intensive')
 ax[1].plot(giorni[1:], perc_delta_hospital, color='royalblue',label='Ricoverati')
-ax[1].axhline(y=0, color='k', linewidth=0.8)
+ax[1].axhline(y=0, color=switch, linewidth=0.8)
 ax[1].annotate("", xy=(0.02, 0.25), xytext=(0.02, 0.5), xycoords='axes fraction', arrowprops=dict(arrowstyle="->", color='limegreen', linewidth=2))
 ax[1].annotate("", xy=(0.02, 0.75), xytext=(0.02, 0.5), xycoords='axes fraction', arrowprops=dict(arrowstyle="->", color='r', linewidth=2))
 ax[1].legend(loc='best')
-ax[1].set_xlabel('Data')
-ax[1].set_ylabel('Variazione (%)')
+ax[1].set_xlabel('Data',fontsize=12)
+ax[1].set_ylabel(r'Variazione (\%)',fontsize=12)
 # get y-axis limits of the plot
 low, high = ax[1].get_ylim()
 # find the new limits
@@ -180,6 +188,17 @@ ax[1].xaxis.set_major_formatter(myFmt)
 plt.setp(ax[0].xaxis.get_majorticklabels(), rotation=35)
 plt.setp(ax[1].xaxis.get_majorticklabels(), rotation=35)
 plt.subplots_adjust(hspace=0)
+
+if dark == True:
+    ax[0].xaxis.label.set_color(switch)
+    ax[0].yaxis.label.set_color(switch)
+    ax[0].tick_params(axis='both', colors=switch)
+    ax[0].set_facecolor('none')
+    ax[1].xaxis.label.set_color(switch)
+    ax[1].yaxis.label.set_color(switch)
+    ax[1].tick_params(axis='both', colors=switch)
+    ax[1].set_facecolor('none')
+    fig.set_facecolor('none')
 
 st.pyplot(fig)
 
@@ -200,24 +219,26 @@ for i in range(len(d_mva.array)):
 if stop == datetime.now().date():
     giorno = giorni[-1].strftime("%d/%m/%Y")
     st.markdown(f'Numeri pi&ugrave recenti, relativi al '+giorno)
-    #col1 = st.columns(3)
     st.metric("Casi", numerize.numerize(int(casi[-1]),1), mysign(delta_casi[-1])+str(delta_casi[-1]), delta_color="inverse")
-    #col2.metric("Ospedalizzati", mysign(delta_hospital[-1])+str(delta_hospital[-1]), str(round(perc_delta_hospital[-1],1))+'%', delta_color="inverse")
-    #col3.metric("Terapie Intensive", mysign(delta_icu[-1])+str(delta_icu[-1]), str(round(perc_delta_icu[-1],1))+'%', delta_color="inverse")
-
 
 fig, ax = plt.subplots(nrows=1)
 ax.plot(giorni[1:], delta_casi, color='lime', linewidth=2)
-ax.plot(giorni[1:], average, color='k', linestyle='dashed', label='Media mobile a 7 giorni')
+ax.plot(giorni[1:], average, color=switch, linestyle='dashed', label='Media mobile a 7 giorni')
 ax.legend(loc='best')
 ax.set_ylim(bottom=0)
-ax.set_ylabel('Incremento casi', fontsize=9)
+ax.set_ylabel('Incremento casi', fontsize=12)
+ax.set_xlabel('Data', fontsize=12)
 ax.set_title(str(where))
 ax.tick_params(direction='in', right=True, top=True)
 ax.xaxis.set_major_formatter(myFmt)
-
 plt.setp(ax.xaxis.get_majorticklabels(), rotation=35)
 plt.subplots_adjust(hspace=0)
-plt.show()
+
+if dark == True:
+    ax.xaxis.label.set_color(switch)
+    ax.yaxis.label.set_color(switch)
+    ax.tick_params(axis='both', colors=switch)
+    ax.set_facecolor('none')
+    fig.set_facecolor('none')
 
 st.pyplot(fig)
