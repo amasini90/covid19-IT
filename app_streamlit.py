@@ -165,7 +165,7 @@ ax[0].plot(giorni[1:], ratio, color='lime', linewidth=2)
 ax[0].plot(giorni[1:], average, color=switch, linestyle='dashed', label='Media mobile a 7 giorni')
 ax[0].legend(loc='best')
 ax[0].set_ylim(bottom=0)
-ax[0].set_ylabel(r'Incremento casi (\%)',fontsize=12)
+ax[0].set_ylabel('Incremento casi (%)',fontsize=12)
 ax[0].tick_params(direction='in', right=True, top=True)
 ax[0].xaxis.set_major_formatter(myFmt)
 ax[0].xaxis.set_ticks_position('top')
@@ -177,7 +177,7 @@ ax[1].annotate("", xy=(0.02, 0.25), xytext=(0.02, 0.5), xycoords='axes fraction'
 ax[1].annotate("", xy=(0.02, 0.75), xytext=(0.02, 0.5), xycoords='axes fraction', arrowprops=dict(arrowstyle="->", color='r', linewidth=2))
 ax[1].legend(loc='best')
 ax[1].set_xlabel('Data',fontsize=12)
-ax[1].set_ylabel(r'Variazione (\%)',fontsize=12)
+ax[1].set_ylabel('Variazione (%)',fontsize=12)
 # get y-axis limits of the plot
 low, high = ax[1].get_ylim()
 # find the new limits
