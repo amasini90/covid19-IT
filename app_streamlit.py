@@ -10,11 +10,10 @@ import matplotlib.dates as mdates
 from numerize import numerize
 myFmt = mdates.DateFormatter('%d/%m')
 from matplotlib import rc
-#plt.rcParams["font.family"] = "Times New Roman"
+plt.rcParams["font.family"] = "Times New Roman"
 
 # Title of the App
 st.title('Covid19 in Italy')
-st.title('Prova Prova')
 
 def get_dates(args=['latest']):
     
