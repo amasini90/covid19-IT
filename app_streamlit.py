@@ -10,8 +10,8 @@ import matplotlib.dates as mdates
 from numerize import numerize
 myFmt = mdates.DateFormatter('%d/%m')
 from matplotlib import rc
-#font = {'family' : 'serif'}
-#rc('font', **font)
+font = {'family' : 'serif'}
+rc('font', **font)
 
 # Title of the App
 st.title('Covid19 in Italy')
@@ -117,6 +117,20 @@ def load_data_local(where='Varese'):
   
     return [giorni,casi]
 
+def set_dark(ax):
+    ax.xaxis.label.set_color(switch)
+    ax.yaxis.label.set_color(switch)
+    ax.tick_params(axis='both', colors=switch)
+    ax.set_facecolor('none')
+
+def compute_rollingmean(quantity):
+    D = pd.Series(quantity, np.arange(len(quantity)))
+    d_mva = D.rolling(7).mean()
+    average = []
+    for i in range(len(d_mva.array)):
+        average.append(d_mva.array[i])
+    return average
+
 dark = False
 if dark == True:
     rc('axes',edgecolor='white')
@@ -125,12 +139,13 @@ else:
     rc('axes',edgecolor='k')
     switch = 'k'
 
+# Get start and stop dates - defaults to previous 30 days
 start,stop = st.date_input('Selezionare date', value=(datetime.now().date()-timedelta(days=30),datetime.now().date()), min_value=datetime.strptime('01/03/2020', "%d/%m/%Y").date(), max_value=None, key=None, help=None, on_change=None, args=None, kwargs=None)
 
+# Get the location for regional sub-area
 where = st.text_input('Provincia da visualizzare', value="Varese", max_chars=None, key=None, type="default", help=None, autocomplete=None, on_change=None, args=None, kwargs=None, placeholder=None)
 
-# Load 30 rows of data into the dataframe.
-
+# Scrape national data from public GitHub repo
 giorni,casi,tamponi,hospital,icu = load_data_italy()
 
 # Compute increments of interest
@@ -145,13 +160,11 @@ perc_delta_icu = 100*delta_icu/icu[1:]
 perc_delta_hospital = 100*delta_hospital/hospital[1:]
 
 # Compute the rolling mean at 7 days
-D = pd.Series(ratio, np.arange(len(ratio)))
-d_mva = D.rolling(7).mean()
-average = []
-for i in range(len(d_mva.array)):
-    average.append(d_mva.array[i])
+average = compute_rollingmean(ratio)
 
 st.subheader('Percentuale di tamponi positivi e variazione ospedalizzazioni')
+
+# Show the metrics of the last day, only if last day is today
 if stop == datetime.now().date():
     giorno = giorni[-1].strftime("%d/%m/%Y")
     st.markdown(f'Numeri pi&ugrave recenti, relativi al '+giorno)
@@ -160,6 +173,7 @@ if stop == datetime.now().date():
     col2.metric("Ospedalizzati", mysign(delta_hospital[-1])+str(delta_hospital[-1]), str(round(perc_delta_hospital[-1],1))+'%', delta_color="inverse")
     col3.metric("Terapie Intensive", mysign(delta_icu[-1])+str(delta_icu[-1]), str(round(perc_delta_icu[-1],1))+'%', delta_color="inverse")
 
+# Plot national cases
 fig, ax = plt.subplots(nrows=2)
 ax[0].plot(giorni[1:], ratio, color='lime', linewidth=2)
 ax[0].plot(giorni[1:], average, color=switch, linestyle='dashed', label='Media mobile a 7 giorni')
@@ -191,37 +205,30 @@ plt.setp(ax[1].xaxis.get_majorticklabels(), rotation=35)
 plt.subplots_adjust(hspace=0)
 
 if dark == True:
-    ax[0].xaxis.label.set_color(switch)
-    ax[0].yaxis.label.set_color(switch)
-    ax[0].tick_params(axis='both', colors=switch)
-    ax[0].set_facecolor('none')
-    ax[1].xaxis.label.set_color(switch)
-    ax[1].yaxis.label.set_color(switch)
-    ax[1].tick_params(axis='both', colors=switch)
-    ax[1].set_facecolor('none')
+    set_dark(ax[0])
+    set_dark(ax[1])
     fig.set_facecolor('none')
 
 st.pyplot(fig)
 
 st.subheader('Casi positivi a '+str(where))
 
+# Scrape local data from public GitHub repo
 giorni,casi = load_data_local(where)
 
 # Compute increments of interest
 delta_casi = np.array(list(casi[i+1]-casi[i] for i in range(len(casi)-1)))
 
 # Compute the rolling mean at 7 days
-D = pd.Series(delta_casi, np.arange(len(delta_casi)))
-d_mva = D.rolling(7).mean()
-average = []
-for i in range(len(d_mva.array)):
-    average.append(d_mva.array[i])
-    
+average = compute_rollingmean(delta_casi)
+
+# Show the metrics of the last day, only if last day is today
 if stop == datetime.now().date():
     giorno = giorni[-1].strftime("%d/%m/%Y")
     st.markdown(f'Numeri pi&ugrave recenti, relativi al '+giorno)
     st.metric("Casi", numerize.numerize(int(casi[-1]),1), mysign(delta_casi[-1])+str(delta_casi[-1]), delta_color="inverse")
 
+# Plot regional cases
 fig, ax = plt.subplots(nrows=1)
 ax.plot(giorni[1:], delta_casi, color='lime', linewidth=2)
 ax.plot(giorni[1:], average, color=switch, linestyle='dashed', label='Media mobile a 7 giorni')
@@ -236,10 +243,7 @@ plt.setp(ax.xaxis.get_majorticklabels(), rotation=35)
 plt.subplots_adjust(hspace=0)
 
 if dark == True:
-    ax.xaxis.label.set_color(switch)
-    ax.yaxis.label.set_color(switch)
-    ax.tick_params(axis='both', colors=switch)
-    ax.set_facecolor('none')
+    set_dark(ax)
     fig.set_facecolor('none')
 
 st.pyplot(fig)
