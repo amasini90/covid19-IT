@@ -10,10 +10,9 @@ import matplotlib.dates as mdates
 from numerize import numerize
 myFmt = mdates.DateFormatter('%d/%m')
 from matplotlib import rc
-plt.rcParams.update({
-    "font.family": "serif",
-    "font.serif": ["Times"],
-})
+font = {'family' : 'serif',
+'weight' : 'bold',
+'size' : 'larger'}
 
 # Title of the App
 st.title('Covid19 in Italy')
