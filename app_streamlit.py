@@ -11,7 +11,6 @@ from numerize import numerize
 myFmt = mdates.DateFormatter('%d/%m')
 from matplotlib import rc
 plt.rcParams.update({
-    "text.usetex": True,
     "font.family": "serif",
     "font.serif": ["Times"],
 })
