@@ -14,6 +14,7 @@ from matplotlib import rc
 
 # Title of the App
 st.title('Covid19 in Italy')
+st.title('Prova Prova')
 
 def get_dates(args=['latest']):
     
