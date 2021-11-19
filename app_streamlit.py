@@ -1,20 +1,19 @@
 import streamlit as st
+from streamlit import legacy_caching
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from pandas.plotting import register_matplotlib_converters
 from urllib.error import HTTPError
-register_matplotlib_converters()
 import matplotlib.dates as mdates
 from numerize import numerize
-myFmt = mdates.DateFormatter('%d/%m')
 from matplotlib import rc
+from PIL import Image
+register_matplotlib_converters()
+myFmt = mdates.DateFormatter('%d/%m')
 font = {'family' : 'serif'}
 rc('font', **font)
-
-# Title of the App
-st.title('Covid19 in Italy')
 
 def get_dates(args=['latest']):
     
@@ -131,7 +130,26 @@ def compute_rollingmean(quantity):
         average.append(d_mva.array[i])
     return average
 
-dark = False
+# Page configuration
+im = Image.open("virus.ico")
+st.set_page_config(page_title="Covid19 in Italia", page_icon=im)
+
+# Title of the App
+st.title('Covid19 in Italy')
+
+if st.config.get_option('theme.base') == 'dark':
+    dark=True
+
+but1,but2,but3 = st.columns(3)
+if but3.button('Pulisci cache'):
+    legacy_caching.clear_cache()
+
+if but2.button('Figure tema chiaro'):
+    dark = False
+
+if but1.button('Figure tema scuro'):
+    dark = True
+
 if dark == True:
     rc('axes',edgecolor='white')
     switch = 'white'
@@ -236,7 +254,6 @@ ax.legend(loc='best')
 ax.set_ylim(bottom=0)
 ax.set_ylabel('Incremento casi', fontsize=12)
 ax.set_xlabel('Data', fontsize=12)
-ax.set_title(str(where))
 ax.tick_params(direction='in', right=True, top=True)
 ax.xaxis.set_major_formatter(myFmt)
 plt.setp(ax.xaxis.get_majorticklabels(), rotation=35)
