@@ -48,17 +48,18 @@ def mysign(inp):
     else:
         return ''
 
-@st.cache
+@st.cache(suppress_st_warning=True, show_spinner=False)
 def load_data_italy():
   
-  #start,stop = get_dates()
   # Array of days
   t = np.arange(start, stop+timedelta(days=1), timedelta(days=1)).astype(datetime)
   
   giorni, casi, tamponi = [],[],[]
   icu, hospital = [],[]
-  for day in t:
- 
+  progress_bar = st.progress(0)
+  for i,day in enumerate(t):
+
+      progress_bar.progress((i+1)/len(t))
       # Convert each day to the correct argument
       argument = day.strftime("%Y%m%d")
  
@@ -84,15 +85,17 @@ def load_data_italy():
   
   return [giorni,casi,tamponi,hospital,icu]
 
-@st.cache
+@st.cache(suppress_st_warning=True, show_spinner=False)
 def load_data_local(where='Varese'):
- 
-    #start,stop = get_dates()
+
     # Array of days
     t = np.arange(start, stop+timedelta(days=1), timedelta(days=1)).astype(datetime)
   
     giorni, casi = [],[]
-    for day in t:
+    progress_bar = st.progress(0)
+    for i,day in enumerate(t):
+
+        progress_bar.progress((i+1)/len(t))
  
         # Convert each day to the correct argument
         argument = day.strftime("%Y%m%d")
@@ -135,36 +138,24 @@ im = Image.open("virus.ico")
 st.set_page_config(page_title="Covid19 in Italia", page_icon=im)
 
 # Title of the App
-st.title('Covid19 in Italy')
+st.title('Covid19 in Italia')
+st.subheader('by A. Masini')
 
-if st.config.get_option('theme.base') == 'dark':
-    dark=True
+#if st.config.get_option('theme.base') == 'dark':
+#    dark=True
 
-but1,but2,but3 = st.columns(3)
-if but3.button('Pulisci cache'):
+if st.button('Aggiorna'):
     legacy_caching.clear_cache()
 
-if but2.button('Figure tema chiaro'):
-    dark = False
-
-if but1.button('Figure tema scuro'):
-    dark = True
-
-if dark == True:
-    rc('axes',edgecolor='white')
-    switch = 'white'
-else:
-    rc('axes',edgecolor='k')
-    switch = 'k'
-
 # Get start and stop dates - defaults to previous 30 days
-start,stop = st.date_input('Selezionare date', value=(datetime.now().date()-timedelta(days=30),datetime.now().date()), min_value=datetime.strptime('01/03/2020', "%d/%m/%Y").date(), max_value=None, key=None, help=None, on_change=None, args=None, kwargs=None)
+start,stop = st.date_input('Periodo da visualizzare (default: ultimi 30 giorni)', value=(datetime.now().date()-timedelta(days=30),datetime.now().date()), min_value=datetime.strptime('01/03/2020', "%d/%m/%Y").date(), max_value=None, key=None, help=None, on_change=None, args=None, kwargs=None)
 
 # Get the location for regional sub-area
-where = st.text_input('Provincia da visualizzare', value="Varese", max_chars=None, key=None, type="default", help=None, autocomplete=None, on_change=None, args=None, kwargs=None, placeholder=None)
+where = st.text_input('Provincia da visualizzare (default: Varese)', value="Varese", max_chars=None, key=None, type="default", help=None, autocomplete=None, on_change=None, args=None, kwargs=None, placeholder=None)
 
 # Scrape national data from public GitHub repo
-giorni,casi,tamponi,hospital,icu = load_data_italy()
+with st.spinner('Attendere...'):
+    giorni,casi,tamponi,hospital,icu = load_data_italy()
 
 # Compute increments of interest
 delta_casi = np.array(list(casi[i+1]-casi[i] for i in range(len(casi)-1)))
@@ -191,10 +182,16 @@ if stop == datetime.now().date():
     col2.metric("Ospedalizzati", mysign(delta_hospital[-1])+str(delta_hospital[-1]), str(round(perc_delta_hospital[-1],1))+'%', delta_color="inverse")
     col3.metric("Terapie Intensive", mysign(delta_icu[-1])+str(delta_icu[-1]), str(round(perc_delta_icu[-1],1))+'%', delta_color="inverse")
 
+
+chart_data = pd.DataFrame(np.random.randn(20, 3),columns=['a', 'b', 'c'])
+my_data = pd.DataFrame({'Dati':ratio, 'Media mobile a 7 giorni':average}, index=giorni[1:])
+
+st.line_chart(my_data)
+
 # Plot national cases
 fig, ax = plt.subplots(nrows=2)
 ax[0].plot(giorni[1:], ratio, color='lime', linewidth=2)
-ax[0].plot(giorni[1:], average, color=switch, linestyle='dashed', label='Media mobile a 7 giorni')
+ax[0].plot(giorni[1:], average, color='k', linestyle='dashed', label='Media mobile a 7 giorni')
 ax[0].legend(loc='best')
 ax[0].set_ylim(bottom=0)
 ax[0].set_ylabel('Incremento casi (%)',fontsize=12)
@@ -204,7 +201,7 @@ ax[0].xaxis.set_ticks_position('top')
 
 ax[1].plot(giorni[1:], perc_delta_icu, color='tomato',label='Terapie intensive')
 ax[1].plot(giorni[1:], perc_delta_hospital, color='royalblue',label='Ricoverati')
-ax[1].axhline(y=0, color=switch, linewidth=0.8)
+ax[1].axhline(y=0, color='k', linewidth=0.8)
 ax[1].annotate("", xy=(0.02, 0.25), xytext=(0.02, 0.5), xycoords='axes fraction', arrowprops=dict(arrowstyle="->", color='limegreen', linewidth=2))
 ax[1].annotate("", xy=(0.02, 0.75), xytext=(0.02, 0.5), xycoords='axes fraction', arrowprops=dict(arrowstyle="->", color='r', linewidth=2))
 ax[1].legend(loc='best')
@@ -222,17 +219,14 @@ plt.setp(ax[0].xaxis.get_majorticklabels(), rotation=35)
 plt.setp(ax[1].xaxis.get_majorticklabels(), rotation=35)
 plt.subplots_adjust(hspace=0)
 
-if dark == True:
-    set_dark(ax[0])
-    set_dark(ax[1])
-    fig.set_facecolor('none')
-
+#st.pyplot(fig)
 st.pyplot(fig)
 
 st.subheader('Casi positivi a '+str(where))
 
 # Scrape local data from public GitHub repo
-giorni,casi = load_data_local(where)
+with st.spinner('Attendere...'):
+    giorni,casi = load_data_local(where)
 
 # Compute increments of interest
 delta_casi = np.array(list(casi[i+1]-casi[i] for i in range(len(casi)-1)))
@@ -249,7 +243,7 @@ if stop == datetime.now().date():
 # Plot regional cases
 fig, ax = plt.subplots(nrows=1)
 ax.plot(giorni[1:], delta_casi, color='lime', linewidth=2)
-ax.plot(giorni[1:], average, color=switch, linestyle='dashed', label='Media mobile a 7 giorni')
+ax.plot(giorni[1:], average, color='k', linestyle='dashed', label='Media mobile a 7 giorni')
 ax.legend(loc='best')
 ax.set_ylim(bottom=0)
 ax.set_ylabel('Incremento casi', fontsize=12)
@@ -258,9 +252,5 @@ ax.tick_params(direction='in', right=True, top=True)
 ax.xaxis.set_major_formatter(myFmt)
 plt.setp(ax.xaxis.get_majorticklabels(), rotation=35)
 plt.subplots_adjust(hspace=0)
-
-if dark == True:
-    set_dark(ax)
-    fig.set_facecolor('none')
 
 st.pyplot(fig)
