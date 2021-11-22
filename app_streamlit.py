@@ -10,8 +10,6 @@ import matplotlib.dates as mdates
 from numerize import numerize
 from matplotlib import rc
 from PIL import Image
-import plotly.figure_factory as ff
-import plotly.graph_objects as go
 register_matplotlib_converters()
 myFmt = mdates.DateFormatter('%d/%m')
 font = {'family' : 'serif'}
@@ -184,8 +182,10 @@ if stop == datetime.now().date():
     col2.metric("Ospedalizzati", mysign(delta_hospital[-1])+str(delta_hospital[-1]), str(round(perc_delta_hospital[-1],1))+'%', delta_color="inverse")
     col3.metric("Terapie Intensive", mysign(delta_icu[-1])+str(delta_icu[-1]), str(round(perc_delta_icu[-1],1))+'%', delta_color="inverse")
 
-#my_data = pd.DataFrame({'Dati':ratio, 'Media mobile':average}, index=giorni[1:])
+#import plotly.figure_factory as ff
+#import plotly.graph_objects as go
 #import plotly.express as px
+#my_data = pd.DataFrame({'Dati':ratio, 'Media mobile':average}, index=giorni[1:])
 #fig = px.line(my_data, labels={'x':'Data','y':'Incremento'})
 #st.plotly_chart(fig, use_container_width=True)
 
