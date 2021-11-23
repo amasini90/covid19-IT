@@ -10,6 +10,8 @@ import matplotlib.dates as mdates
 from numerize import numerize
 from matplotlib import rc
 from PIL import Image
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 register_matplotlib_converters()
 myFmt = mdates.DateFormatter('%d/%m')
 font = {'family' : 'serif'}
@@ -165,7 +167,7 @@ perc_delta_hospital = 100*delta_hospital/hospital[1:]
 # Compute the rolling mean at 7 days
 average = compute_rollingmean(ratio)
 
-st.subheader('Percentuale di tamponi positivi e variazione ospedalizzazioni')
+st.subheader('Percentuale di tamponi positivi e variazione ospedalizzazioni in Italia')
 
 # Show the metrics of the last day, only if last day is today
 if stop == datetime.now().date():
@@ -176,46 +178,93 @@ if stop == datetime.now().date():
     col2.metric("Ospedalizzati", mysign(delta_hospital[-1])+str(delta_hospital[-1]), str(round(perc_delta_hospital[-1],1))+'%', delta_color="inverse")
     col3.metric("Terapie Intensive", mysign(delta_icu[-1])+str(delta_icu[-1]), str(round(perc_delta_icu[-1],1))+'%', delta_color="inverse")
 
-#import plotly.figure_factory as ff
-#import plotly.graph_objects as go
-#import plotly.express as px
+fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.02)
+
+fig.append_trace(go.Scatter(x=giorni[1:], y=ratio,mode='lines', line = dict(color='lime', width=2), showlegend=True, name='Tamponi positivi', legendgroup='1'), row=1, col=1)
+fig.append_trace(go.Scatter(x=giorni[1:], y=average,mode='lines',line = dict(color='orange', width=4, dash='dash'), name='Media mobile a 7 giorni', legendgroup='2'), row=1, col=1)
+
+fig.append_trace(go.Scatter(
+    x=giorni[1:], 
+    y=perc_delta_hospital,
+    mode='lines', 
+    line = dict(color='royalblue', width=2),
+    name = 'Ricoverati',
+    legendgroup='3'
+    ),
+    row=2, 
+    col=1
+)
+
+fig.append_trace(go.Scatter(
+    x=giorni[1:], 
+    y=perc_delta_icu,
+    mode='lines', 
+    line = dict(color='tomato', width=2),
+    name = 'Terapie intensive', 
+    legendgroup='4'
+    ), 
+    row=2, 
+    col=1
+)
+
+fig.update_yaxes(title_text="Incremento casi (%)", row=1, col=1)
+fig.update_yaxes(title_text="Variazione (%)", row=2, col=1)
+fig.update_xaxes(title_text="Data", row=2, col=1)
+
+fig.update_layout(
+    height=600, width=600,
+    legend=dict(
+    orientation="h",
+    yanchor="bottom",
+    y=1.02,
+    xanchor="right",
+    x=1,
+    font = dict(size = 12)
+    ),
+    #legend_tracegroupgap = 180,
+    font=dict(
+        size=15,
+    )
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
 #my_data = pd.DataFrame({'Dati':ratio, 'Media mobile':average}, index=giorni[1:])
 #fig = px.line(my_data, labels={'x':'Data','y':'Incremento'})
 #st.plotly_chart(fig, use_container_width=True)
 
 # Plot national cases
-fig, ax = plt.subplots(nrows=2)
-ax[0].plot(giorni[1:], ratio, color='lime', linewidth=2)
-ax[0].plot(giorni[1:], average, color='k', linestyle='dashed', label='Media mobile a 7 giorni')
-ax[0].legend(loc='best')
-ax[0].set_ylim(bottom=0)
-ax[0].set_ylabel('Incremento casi (%)',fontsize=12)
-ax[0].tick_params(direction='in', right=True, top=True)
-ax[0].xaxis.set_major_formatter(myFmt)
-ax[0].xaxis.set_ticks_position('top')
+#fig, ax = plt.subplots(nrows=2)
+#ax[0].plot(giorni[1:], ratio, color='lime', linewidth=2)
+#ax[0].plot(giorni[1:], average, color='k', linestyle='dashed', label='Media mobile a 7 giorni')
+#ax[0].legend(loc='best')
+#ax[0].set_ylim(bottom=0)
+#ax[0].set_ylabel('Incremento casi (%)',fontsize=12)
+#ax[0].tick_params(direction='in', right=True, top=True)
+#ax[0].xaxis.set_major_formatter(myFmt)
+#ax[0].xaxis.set_ticks_position('top')
 
-ax[1].plot(giorni[1:], perc_delta_icu, color='tomato',label='Terapie intensive')
-ax[1].plot(giorni[1:], perc_delta_hospital, color='royalblue',label='Ricoverati')
-ax[1].axhline(y=0, color='k', linewidth=0.8)
-ax[1].annotate("", xy=(0.02, 0.25), xytext=(0.02, 0.5), xycoords='axes fraction', arrowprops=dict(arrowstyle="->", color='limegreen', linewidth=2))
-ax[1].annotate("", xy=(0.02, 0.75), xytext=(0.02, 0.5), xycoords='axes fraction', arrowprops=dict(arrowstyle="->", color='r', linewidth=2))
-ax[1].legend(loc='best')
-ax[1].set_xlabel('Data',fontsize=12)
-ax[1].set_ylabel('Variazione (%)',fontsize=12)
+#ax[1].plot(giorni[1:], perc_delta_icu, color='tomato',label='Terapie intensive')
+#ax[1].plot(giorni[1:], perc_delta_hospital, color='royalblue',label='Ricoverati')
+#ax[1].axhline(y=0, color='k', linewidth=0.8)
+#ax[1].annotate("", xy=(0.02, 0.25), xytext=(0.02, 0.5), xycoords='axes fraction', arrowprops=dict(arrowstyle="->", color='limegreen', linewidth=2))
+#ax[1].annotate("", xy=(0.02, 0.75), xytext=(0.02, 0.5), xycoords='axes fraction', arrowprops=dict(arrowstyle="->", color='r', linewidth=2))
+#ax[1].legend(loc='best')
+#ax[1].set_xlabel('Data',fontsize=12)
+#ax[1].set_ylabel('Variazione (%)',fontsize=12)
 # get y-axis limits of the plot
-low, high = ax[1].get_ylim()
+#low, high = ax[1].get_ylim()
 # find the new limits
-bound = max(abs(low), abs(high))
+#bound = max(abs(low), abs(high))
 # set new limits
-ax[1].set_ylim(-bound, bound)
-ax[1].tick_params(axis='both', direction='in', left=True, right=True, bottom=True, top=True)
-ax[1].xaxis.set_major_formatter(myFmt)
-plt.setp(ax[0].xaxis.get_majorticklabels(), rotation=35)
-plt.setp(ax[1].xaxis.get_majorticklabels(), rotation=35)
-plt.subplots_adjust(hspace=0)
+#ax[1].set_ylim(-bound, bound)
+#ax[1].tick_params(axis='both', direction='in', left=True, right=True, bottom=True, top=True)
+#ax[1].xaxis.set_major_formatter(myFmt)
+#plt.setp(ax[0].xaxis.get_majorticklabels(), rotation=35)
+#plt.setp(ax[1].xaxis.get_majorticklabels(), rotation=35)
+#plt.subplots_adjust(hspace=0)
 
 #st.pyplot(fig)
-st.pyplot(fig)
 
 st.subheader('Casi positivi a '+str(where))
 
@@ -235,17 +284,44 @@ if stop == datetime.now().date():
     st.markdown(f'Numeri pi&ugrave recenti, relativi al '+giorno)
     st.metric("Casi", numerize.numerize(int(casi[-1]),1), mysign(delta_casi[-1])+str(delta_casi[-1]), delta_color="inverse")
 
-# Plot regional cases
-fig, ax = plt.subplots(nrows=1)
-ax.plot(giorni[1:], delta_casi, color='lime', linewidth=2)
-ax.plot(giorni[1:], average, color='k', linestyle='dashed', label='Media mobile a 7 giorni')
-ax.legend(loc='best')
-ax.set_ylim(bottom=0)
-ax.set_ylabel('Incremento casi', fontsize=12)
-ax.set_xlabel('Data', fontsize=12)
-ax.tick_params(direction='in', right=True, top=True)
-ax.xaxis.set_major_formatter(myFmt)
-plt.setp(ax.xaxis.get_majorticklabels(), rotation=35)
-plt.subplots_adjust(hspace=0)
 
-st.pyplot(fig)
+fig = go.Figure()
+
+fig.add_trace(go.Scatter(x=giorni[1:], y=delta_casi,mode='lines', line = dict(color='lime', width=2), showlegend=True, name='Tamponi positivi', legendgroup='1'))
+fig.add_trace(go.Scatter(x=giorni[1:], y=average,mode='lines',line = dict(color='orange', width=4, dash='dash'), name='Media mobile a 7 giorni', legendgroup='2'))
+
+fig.update_yaxes(title_text="Incremento casi")
+fig.update_xaxes(title_text="Data")
+
+fig.update_layout(
+    height=600, width=600,
+    legend=dict(
+    orientation="h",
+    yanchor="bottom",
+    y=1.02,
+    xanchor="right",
+    x=1,
+    font = dict(size = 12)
+    ),
+    #legend_tracegroupgap = 180,
+    font=dict(
+        size=15,
+    )
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+# Plot regional cases
+#fig, ax = plt.subplots(nrows=1)
+#ax.plot(giorni[1:], delta_casi, color='lime', linewidth=2)
+#ax.plot(giorni[1:], average, color='k', linestyle='dashed', label='Media mobile a 7 giorni')
+#ax.legend(loc='best')
+#ax.set_ylim(bottom=0)
+#ax.set_ylabel('Incremento casi', fontsize=12)
+#ax.set_xlabel('Data', fontsize=12)
+#ax.tick_params(direction='in', right=True, top=True)
+#ax.xaxis.set_major_formatter(myFmt)
+#plt.setp(ax.xaxis.get_majorticklabels(), rotation=35)
+#plt.subplots_adjust(hspace=0)
+
+#st.pyplot(fig)
