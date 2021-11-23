@@ -119,12 +119,6 @@ def load_data_local(where='Varese'):
   
     return [giorni,casi]
 
-def set_dark(ax):
-    ax.xaxis.label.set_color(switch)
-    ax.yaxis.label.set_color(switch)
-    ax.tick_params(axis='both', colors=switch)
-    ax.set_facecolor('none')
-
 def compute_rollingmean(quantity):
     D = pd.Series(quantity, np.arange(len(quantity)))
     d_mva = D.rolling(7).mean()
