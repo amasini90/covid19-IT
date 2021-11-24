@@ -1,22 +1,14 @@
 # covid19-IT
-Code to display the Italian percentage of new covid19 cases for a given timespan, relative to new daily tests, as well as the percentage variation of people in intensive care unit (ICU) or generally hospitalized with less severe symptoms.
-The code reads the data from the official GitHub of the Italian government and nicely displays the relevant quantities.
+Basic app (hosted by Streamit) to display the Italian percentage of new covid19 cases for a given timespan, relative to new daily tests, as well as the percentage variation of people in intensive care unit (ICU) or generally hospitalized with less severe symptoms.
+The app reads the data from the official GitHub of the Italian government and nicely displays the relevant quantities.
 
 # Prerequisites
+* Streamlit (`pip install streamlit`)
 * Numpy (`pip install numpy`)
 * Pandas (`pip install pandas`)
 * Matplotlib (`pip install matplotlib`)
-* Tqdm (`pip install tqdm`)
+* Numerize (`pip install numerize`)
+* Plotly (`pip install plotly`)
 
 # Syntax and Usage
-Simply run the script with 
-
-`python update_covid_it.py startdate enddate`,
-
-with dates in format `dd/mm/yyyy`.
-If you prefer, you can simply use an end date; the code will plot the 30 days prior to the given date (adjustable in the code).
-The end date can also be passed as "latest", i.e.
-
-`python update_covid_it.py latest`
-
-will plot the last 30 days data.
+The app is hosted at https://share.streamlit.io/amasini90/covid19-it/main/app_streamlit.py
