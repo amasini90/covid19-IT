@@ -114,46 +114,7 @@ def append_lines(day,arg):
     data_loc.to_csv('data/local_data.csv', mode='a', header=False)
     return True
 
-@st.cache(suppress_st_warning=True, show_spinner=False)
-def load_data_italy():
-  
-  # Array of days
-  t = np.arange(start, stop+timedelta(days=1), timedelta(days=1)).astype(datetime)
-  
-  giorni, casi, tamponi = [],[],[]
-  icu, hospital = [],[]
-  progress_bar = st.progress(0)
-  for i,day in enumerate(t):
 
-      progress_bar.progress((i+1)/len(t))
-
-      # Convert each day to the correct argument
-      argument = day.strftime("%Y%m%d")
- 
-      # Link to the appropriate csv with the info
-      url = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-regioni/dpc-covid19-ita-regioni-'+argument+'.csv'
-      
-      try:
-          df = pd.read_csv(url, index_col=0)
-      except HTTPError as err:
-          if err.code == 404:
-              print('Non existent file for day',day.date(),'- skipping it.')
-              continue
-          else:
-              raise
-      
-      giorni.append(day)
-      casi.append(np.sum(df["totale_casi"]))
-      tamponi.append(np.sum(df["tamponi"]))
-      hospital.append(np.sum(df["ricoverati_con_sintomi"]))
-      icu.append(np.sum(df["terapia_intensiva"]))
-  
-  giorni = np.array(giorni)
-  
-  return [giorni,casi,tamponi,hospital,icu]
-
-@st.cache(suppress_st_warning=True, show_spinner=False)
-def load_data_local(where='Varese'):
 
     # Array of days
     t = np.arange(start, stop+timedelta(days=1), timedelta(days=1)).astype(datetime)
