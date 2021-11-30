@@ -348,6 +348,7 @@ fig.update_xaxes(title_text="Data")
 
 fig.update_layout(
     height=600, width=600,
+    yaxis_rangemode="nonnegative",
     legend=dict(
     orientation="h",
     yanchor="bottom",
