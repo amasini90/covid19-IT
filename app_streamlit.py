@@ -40,31 +40,6 @@ province=[
     "Verona","Vicenza","Belluno","Treviso","Venezia","Padova","Rovigo"
 ]
 
-def get_dates(args=['latest']):
-    
-    if len(args) < 1:
-        print('No arguments given. Please input either an end date in format dd/mm/yyyy, or a range of dates.')
-        raise ValueError
-
-    elif len(args) == 1: # If there is just a stop, default to the 30 days before today or given date
-        if args[0] == 'latest':
-            date = datetime.now().date()
-            today = date.strftime("%d/%m/%Y")
-            stop = datetime.strptime(today, "%d/%m/%Y").date()
-        else:
-            stop = datetime.strptime(args[0], "%d/%m/%Y").date() # convert from yyyymmdd string to date
-        start = stop-timedelta(days=30)
-    elif len(args) > 1: # If there are both a start and stop, the start is the first argument
-        start = datetime.strptime(args[0], "%d/%m/%Y").date()
-        if args[1] == 'latest':
-            date = datetime.now().date()
-            today = date.strftime("%d/%m/%Y")
-            stop = datetime.strptime(today, "%d/%m/%Y").date()
-        else:
-            stop = datetime.strptime(args[1], "%d/%m/%Y").date()
-
-    return (start,stop)
-
 def mysign(inp):
     if np.sign(inp) > 0:
         return '+'
