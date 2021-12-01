@@ -173,7 +173,7 @@ with st.spinner('Attendere...'):
                 stop = local_data.index[-1]
                 break
             else:
-                append_lines(result)
+                append_lines(day, result)
 
         # Reload data
         local_data = pd.read_csv('data/local_data.csv')
