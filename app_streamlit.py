@@ -76,7 +76,8 @@ def append_lines(day,arg):
     tamponi = np.sum(df_nat["tamponi"])
     hospital = np.sum(df_nat["ricoverati_con_sintomi"])
     icu = np.sum(df_nat["terapia_intensiva"])
-    data_nat = pd.DataFrame({'Casi': casi, 'Tamponi': tamponi, 'Ospedalizzati': hospital, 'TI': icu}, index=[giorni])
+    deaths = np.sum(df_nat["deceduti"])
+    data_nat = pd.DataFrame({'Casi': casi, 'Tamponi': tamponi, 'Ospedalizzati': hospital, 'TI': icu, 'Deceduti': deaths}, index=[giorni])
     data_nat.to_csv('data/national_data.csv', mode='a', header=False)
 
     df_loc = arg[1]
@@ -88,39 +89,6 @@ def append_lines(day,arg):
     data_loc = pd.DataFrame([casiprov], columns=province, index=[giorni])
     data_loc.to_csv('data/local_data.csv', mode='a', header=False)
     return True
-
-
-
-    # Array of days
-    t = np.arange(start, stop+timedelta(days=1), timedelta(days=1)).astype(datetime)
-  
-    giorni, casi = [],[]
-    progress_bar = st.progress(0)
-    for i,day in enumerate(t):
-
-        progress_bar.progress((i+1)/len(t))
- 
-        # Convert each day to the correct argument
-        argument = day.strftime("%Y%m%d")
-      
-        # Link to the appropriate csv with the info
-        url = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-'+argument+'.csv'
-      
-        try:
-           df = pd.read_csv(url, index_col=0)
-        except HTTPError as err:
-           if err.code == 404:
-               print('Non existent file for day',day.date(),'- skipping it.')
-               continue
-           else:
-               raise
-      
-        giorni.append(day)
-        casi.append(df[df['denominazione_provincia']==where]["totale_casi"].values[0])
- 
-    giorni = np.array(giorni)
-  
-    return [giorni,casi]
 
 def compute_rollingmean(quantity):
     D = pd.Series(quantity, np.arange(len(quantity)))
@@ -161,16 +129,17 @@ with st.spinner('Attendere...'):
     start = inp_start.strftime("%d/%m/%Y")
     stop = inp_stop.strftime("%d/%m/%Y")
     # Check the dates
-    if len(local_data[local_data.index == stop]) == 0:
-        delta = datetime.strptime(stop, "%d/%m/%Y").date() - datetime.strptime(local_data.index[-1], "%d/%m/%Y").date()
+    if len(natio_data[natio_data.index == stop]) == 0:
+        delta = datetime.strptime(stop, "%d/%m/%Y").date() - datetime.strptime(natio_data.index[-1], "%d/%m/%Y").date()
         
         # Array of days
-        t = np.arange(datetime.strptime(local_data.index[-1], "%d/%m/%Y").date()+timedelta(days=1), datetime.strptime(stop, "%d/%m/%Y").date()+timedelta(days=1), timedelta(days=1)).astype(datetime)
-        
+        t = np.arange(datetime.strptime(natio_data.index[-1], "%d/%m/%Y").date()+timedelta(days=1), datetime.strptime(stop, "%d/%m/%Y").date()+timedelta(days=1), timedelta(days=1)).astype(datetime)
+        print(t)
         for i,day in enumerate(t):
             result = add_day(day)
+            
             if result == 0:
-                stop = local_data.index[-1]
+                stop = natio_data.index[-1]
                 break
             else:
                 append_lines(day, result)
@@ -195,6 +164,7 @@ casi = df0["Casi"].values
 tamponi = df0["Tamponi"].values 
 hospital = df0["Ospedalizzati"].values 
 icu = df0["TI"].values 
+deaths = df0["Deceduti"].values 
 
 # Compute increments of interest
 delta_casi = np.array(list(casi[i+1]-casi[i] for i in range(len(casi)-1)))
@@ -207,8 +177,13 @@ delta_hospital = np.array(list(hospital[i+1]-hospital[i] for i in range(len(hosp
 perc_delta_icu = 100*delta_icu/icu[1:]
 perc_delta_hospital = 100*delta_hospital/hospital[1:]
 
-# Compute the rolling mean at 7 days
+delta_deaths = np.array(list(deaths[i+1]-deaths[i] for i in range(len(deaths)-1)))
+
+# Compute the rolling means at 7 days
 average = compute_rollingmean(ratio)
+average_hosp = compute_rollingmean(perc_delta_hospital)
+average_icu = compute_rollingmean(perc_delta_icu)
+average_deaths = compute_rollingmean(delta_deaths)
 
 st.subheader('Percentuale di tamponi positivi e variazione ospedalizzazioni in Italia')
 
@@ -216,21 +191,23 @@ st.subheader('Percentuale di tamponi positivi e variazione ospedalizzazioni in I
 if inp_stop == datetime.now().date():
     giorno = giorni[-1]
     st.markdown(f'Numeri pi&ugrave recenti, relativi al '+giorno)
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     col1.metric("Casi", mysign(delta_casi[-1])+str(delta_casi[-1]), str(round(ratio[-1],1))+'%', delta_color="inverse")
     col2.metric("Ospedalizzati", mysign(delta_hospital[-1])+str(delta_hospital[-1]), str(round(perc_delta_hospital[-1],1))+'%', delta_color="inverse")
     col3.metric("Terapie Intensive", mysign(delta_icu[-1])+str(delta_icu[-1]), str(round(perc_delta_icu[-1],1))+'%', delta_color="inverse")
+    col4.metric("Deceduti", mysign(delta_deaths[-1])+str(delta_deaths[-1]), delta_color="inverse")
 
 # Plot the national cases
 giorni0 = list([datetime.strptime(giorno, "%d/%m/%Y").date() for giorno in giorni])
-fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.02)
+fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.02)
 
 fig.append_trace(go.Scatter(
     x=giorni0[1:], 
     y=ratio,
     mode='lines', 
-    line = dict(color='lime', width=2), 
-    showlegend=True, 
+    line = dict(color='lawngreen', width=1),
+    opacity=.5, 
+    showlegend=False, 
     name='Tamponi positivi', 
     legendgroup='1'
     ), 
@@ -242,8 +219,8 @@ fig.append_trace(go.Scatter(
     x=giorni0[1:], 
     y=average,
     mode='lines',
-    line = dict(color='orange', width=4, dash='dash'), 
-    name='Media mobile a 7 giorni', 
+    line = dict(color='lawngreen', width=3), 
+    name='% tamponi positivi', 
     legendgroup='2'
     ), 
     row=1, 
@@ -254,10 +231,23 @@ fig.append_trace(go.Scatter(
     x=giorni0[1:], 
     y=perc_delta_hospital,
     mode='lines', 
-    line = dict(color='royalblue', width=2),
+    line = dict(color='turquoise', width=1),
+    opacity=.5,
+    showlegend=False,
     name = 'Ricoverati',
     legendgroup='3'
     ),
+    row=2, 
+    col=1
+)
+fig.append_trace(go.Scatter(
+    x=giorni0[1:], 
+    y=average_hosp,
+    mode='lines',
+    line = dict(color='turquoise', width=3), 
+    name='Ricoverati', 
+    legendgroup='4'
+    ), 
     row=2, 
     col=1
 )
@@ -266,17 +256,56 @@ fig.append_trace(go.Scatter(
     x=giorni0[1:], 
     y=perc_delta_icu,
     mode='lines', 
-    line = dict(color='tomato', width=2),
+    line = dict(color='coral', width=1),
+    opacity=.5,
+    showlegend=False,
     name = 'Terapie intensive', 
-    legendgroup='4'
+    legendgroup='5'
+    ), 
+    row=2, 
+    col=1
+)
+fig.append_trace(go.Scatter(
+    x=giorni0[1:], 
+    y=average_icu,
+    mode='lines', 
+    line = dict(color='coral', width=3),
+    name = 'Terapie intensive', 
+    legendgroup='6'
     ), 
     row=2, 
     col=1
 )
 
+fig.append_trace(go.Scatter(
+    x=giorni0[1:], 
+    y=delta_deaths,
+    mode='lines', 
+    line = dict(color='gold', width=1),
+    opacity=.5,
+    showlegend=False,
+    name = 'Deceduti', 
+    legendgroup='7'
+    ), 
+    row=3, 
+    col=1
+)
+fig.append_trace(go.Scatter(
+    x=giorni0[1:], 
+    y=average_deaths,
+    mode='lines', 
+    line = dict(color='gold', width=3),
+    name = 'Deceduti', 
+    legendgroup='8'
+    ), 
+    row=3, 
+    col=1
+)
+
 fig.update_yaxes(title_text="Incremento casi (%)", row=1, col=1)
 fig.update_yaxes(title_text="Variazione (%)", row=2, col=1)
-fig.update_xaxes(title_text="Data", row=2, col=1)
+fig.update_yaxes(title_text="Decessi", row=3, col=1)
+fig.update_xaxes(title_text="Data", row=3, col=1)
 
 fig.update_layout(
     height=600, width=600,
@@ -315,8 +344,8 @@ if inp_stop == datetime.now().date():
 # Plot the local cases
 fig = go.Figure()
 
-fig.add_trace(go.Scatter(x=giorni0[1:], y=delta_casi,mode='lines', line = dict(color='lime', width=2), showlegend=True, name='Tamponi positivi', legendgroup='1'))
-fig.add_trace(go.Scatter(x=giorni0[1:], y=average,mode='lines',line = dict(color='orange', width=4, dash='dash'), name='Media mobile a 7 giorni', legendgroup='2'))
+fig.add_trace(go.Scatter(x=giorni0[1:], y=delta_casi,mode='lines', line = dict(color='hotpink', width=1), opacity=.5, showlegend=False, name='Tamponi positivi', legendgroup='1'))
+fig.add_trace(go.Scatter(x=giorni0[1:], y=average,mode='lines',line = dict(color='hotpink', width=3), name='Nuovi casi', legendgroup='2'))
 
 fig.update_yaxes(title_text="Incremento casi")
 fig.update_xaxes(title_text="Data")
