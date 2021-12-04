@@ -104,7 +104,6 @@ st.set_page_config(page_title="Covid19 in Italia", page_icon=im)
 
 # Title of the App
 st.title('Covid19 in Italia')
-st.subheader('by A. Masini')
 
 if st.button('Aggiorna'):
     legacy_caching.clear_cache()
@@ -134,7 +133,7 @@ with st.spinner('Attendere...'):
         
         # Array of days
         t = np.arange(datetime.strptime(natio_data.index[-1], "%d/%m/%Y").date()+timedelta(days=1), datetime.strptime(stop, "%d/%m/%Y").date()+timedelta(days=1), timedelta(days=1)).astype(datetime)
-        print(t)
+
         for i,day in enumerate(t):
             result = add_day(day)
             
@@ -326,14 +325,34 @@ st.plotly_chart(fig, use_container_width=True)
 
 st.subheader('Casi positivi a '+str(where))
 
+prov2 = province.copy()
+prov2.sort()
+
+pop = [419847, 411922, 465023, 123895, 336870, 204575, 209648, 405963,
+    1222818, 382685, 199599, 269233, 1099621, 171838, 1019539, 533715,
+    1247583, 382454, 420117, 252803, 214629, 911606, 1066765, 346514,
+    376397, 594671, 684786, 351698, 166617, 582353, 158183, 170248, 341967,
+    986001, 601419, 393556, 473467, 816916, 136809, 218538, 208585, 81918,
+    292356, 215538, 561139, 777507, 332593, 329590, 225885, 380676, 307421,
+    403585, 189841, 193457, 609223, 3249821, 704672, 867421, 3017658, 362199,
+    202951, 153226, 929520, 1214291, 453604, 534951, 643311, 354139, 314689, 
+    284075, 416425, 290819, 309058, 354122, 256047, 314950, 386309, 526586, 526349,
+    151668, 335478, 4227588, 229652, 1075299, 481052, 268766, 263526, 
+    386451, 179234, 340879, 560048, 301814, 221702, 2212996, 418363, 544745, 
+    878070, 229470, 523416, 879929, 842942, 155065, 167189, 922291, 153225,
+    850379, 306934]
+pop_df = pd.DataFrame({'Provincia': prov2, 'Pop':pop})
+option = st.selectbox('Compara con altra provincia?',prov2, index=0)
+
 df1 = local_data.loc[start:stop][where]
 casi = df1.values
-
+pop1 = pop_df[pop_df['Provincia'] == where]['Pop'].values
 # Compute increments of interest
 delta_casi = np.array(list(casi[i+1]-casi[i] for i in range(len(casi)-1)))
+delta_casi_pertho = 1e5*delta_casi/pop1
 
 # Compute the rolling mean at 7 days
-average = compute_rollingmean(delta_casi)
+average = compute_rollingmean(delta_casi_pertho)
 
 # Show the metrics of the last day, only if last day is today
 if inp_stop == datetime.now().date():
@@ -344,14 +363,24 @@ if inp_stop == datetime.now().date():
 # Plot the local cases
 fig = go.Figure()
 
-fig.add_trace(go.Scatter(x=giorni0[1:], y=delta_casi,mode='lines', line = dict(color='hotpink', width=1), opacity=.5, showlegend=False, name='Tamponi positivi', legendgroup='1'))
-fig.add_trace(go.Scatter(x=giorni0[1:], y=average,mode='lines',line = dict(color='hotpink', width=3), name='Nuovi casi', legendgroup='2'))
+fig.add_trace(go.Scatter(x=giorni0[1:], y=average,mode='lines',line = dict(color='hotpink', width=3), name=where, legendgroup='2'))
 
-fig.update_yaxes(title_text="Incremento casi")
+if option:
+    df2 = local_data.loc[start:stop][option]
+    pop2 = pop_df[pop_df['Provincia'] == option]['Pop'].values
+    casi2 = df2.values
+
+    delta_casi2 = 1e5*np.array(list(casi2[i+1]-casi2[i] for i in range(len(casi2)-1)))/pop2
+    average2 = compute_rollingmean(delta_casi2)
+    fig.add_trace(go.Scatter(x=giorni0[1:], y=average2,mode='lines',line = dict(color='mediumaquamarine', width=3), name=option, legendgroup='3'))
+else:
+    fig.add_trace(go.Scatter(x=giorni0[1:], y=delta_casi,mode='lines', line = dict(color='hotpink', width=1), opacity=.5, showlegend=False, name='Tamponi positivi', legendgroup='1'))
+
+fig.update_yaxes(title_text="Casi ogni 100mila abitanti")
 fig.update_xaxes(title_text="Data")
 
 fig.update_layout(
-    height=600, width=600,
+    height=400, width=600,
     yaxis_rangemode="nonnegative",
     legend=dict(
     orientation="h",
@@ -368,3 +397,7 @@ fig.update_layout(
 st.plotly_chart(fig, use_container_width=True)
 
 st.write('Fonte dei dati: Presidenza del Consiglio dei Ministri - Dipartimento della Protezione Civile')
+st.write('Fonte popolazione province: https://www.tuttitalia.it/province/')
+col1, col2 = st.columns([2,1])
+col1.write('Autore: Alberto Masini (2021); Licenza CC BY-NC-ND 3.0')
+col2.image('by-nc-nd.eu.png', width=60)
