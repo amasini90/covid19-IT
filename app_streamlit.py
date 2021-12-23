@@ -43,8 +43,6 @@ province=[
 def mysign(inp):
     if np.sign(inp) > 0:
         return '+'
-    elif np.sign(inp) < 0:
-        return '-'
     else:
         return ''
 
