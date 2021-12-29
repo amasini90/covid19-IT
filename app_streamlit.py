@@ -14,6 +14,10 @@ rc('font', **font)
 import util, analysis
 
 
+local_data_path = 'data/local_data.csv'
+national_data_path = 'data/national_data.csv'
+
+
 def main():
     # Page configuration
     im = Image.open("virus.ico")
@@ -27,17 +31,21 @@ def main():
 
     ############################
     # Get start and stop dates - defaults to previous 30 days
-    # TODO handle exception while selecting the dates
-    input_start, input_stop = st.date_input('Periodo da visualizzare (default: ultimi 30 giorni)',
-                                       value=(datetime.now().date()-timedelta(days=30),datetime.now().date()),
-                                       min_value=datetime.strptime('01/03/2020', "%d/%m/%Y").date(),
-                                       max_value=datetime.now().date(),
-                                       key=None, help=None, on_change=None, args=None, kwargs=None)
+    input_start = datetime.now().date()-timedelta(days=30)
+    input_stop = datetime.now().date()
+    try:
+        input_start, input_stop = st.date_input('Periodo da visualizzare (default: ultimi 30 giorni)',
+                                           value=(input_start, input_stop),
+                                           min_value=datetime.strptime('01/03/2020', "%d/%m/%Y").date(),
+                                           max_value=datetime.now().date(),
+                                           key=None, help=None, on_change=None, args=None, kwargs=None)
+    except:
+        pass
 
     # Load the data
     # TODO should first download and update this data and then read it
-    local_data = util.get_data('data/local_data.csv')
-    national_data = util.get_data('data/national_data.csv')
+    local_data = util.get_data(local_data_path)
+    national_data = util.get_data(national_data_path)
 
     # Scrape missing national and local data from public GitHub repo, if available
     with st.spinner('Attendere...'):
@@ -61,8 +69,8 @@ def main():
                     util.append_lines(day, result)
 
             # Reload data
-            local_data = util.get_data('data/local_data.csv')
-            national_data = util.get_data('data/national_data.csv')
+            local_data = util.get_data(local_data_path)
+            national_data = util.get_data(national_data_path)
 
         if len(local_data[local_data.index == start_date]) == 0:
             if datetime.strptime(start_date, "%d/%m/%Y").date() < datetime.now().date():
