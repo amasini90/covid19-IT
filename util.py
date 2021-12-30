@@ -8,6 +8,13 @@ def get_data(data_path):
     return data.set_index(data.columns[0])
 
 
+def get_provinces():
+    data = pd.read_csv('data/local_data.csv')
+    columns = list(data.columns)
+    columns.pop(0) # remove index column
+    return columns
+
+
 def mysign(inp):
     if np.sign(inp) > 0:
         return '+'
@@ -35,29 +42,7 @@ def add_day(day):
     return [df_nat, df_loc]
 
 
-# TODO get this automatically
-provinces = [
-    "L'Aquila","Teramo","Pescara","Chieti",
-    "Potenza","Matera",
-    "Cosenza","Catanzaro","Reggio di Calabria","Crotone","Vibo Valentia",
-    "Caserta","Benevento","Napoli","Avellino","Salerno",
-    "Piacenza","Parma","Reggio nell'Emilia","Modena","Bologna","Ferrara","Ravenna","Forlì-Cesena","Rimini",
-    "Udine","Gorizia","Trieste","Pordenone",
-    "Viterbo","Rieti","Roma","Latina","Frosinone",
-    "Imperia","Genova","Savona","La Spezia",
-    "Varese","Como","Sondrio","Milano","Bergamo","Brescia","Pavia","Cremona","Mantova","Lecco","Lodi","Monza e della Brianza",
-    "Pesaro e Urbino","Ancona","Macerata","Ascoli Piceno","Fermo",
-    "Campobasso","Isernia",
-    "Trento","Bolzano",
-    "Torino","Vercelli","Novara","Cuneo","Asti","Alessandria","Biella","Verbano-Cusio-Ossola",
-    "Foggia","Bari","Taranto","Brindisi","Lecce","Barletta-Andria-Trani",
-    "Sassari","Nuoro","Cagliari","Oristano","Sud Sardegna",
-    "Trapani","Palermo","Messina","Agrigento","Caltanissetta","Enna","Catania","Ragusa","Siracusa",
-    "Massa Carrara","Lucca","Pistoia","Firenze","Livorno","Pisa","Arezzo","Siena","Grosseto","Prato",
-    "Perugia","Terni",
-    "Aosta",
-    "Verona","Vicenza","Belluno","Treviso","Venezia","Padova","Rovigo"
-]
+provinces = get_provinces()
 
 
 def append_lines(day, arg):
