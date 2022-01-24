@@ -105,7 +105,7 @@ def main():
     st.write('Fonte popolazione province: https://www.tuttitalia.it/province/')
     col1, col2 = st.columns([2,1])
     link = '[Alberto Masini](http://www.linkedin.com/in/almasini/)'
-    col1.write('Autore: '+link+' (2021); Licenza CC BY-NC-ND 3.0')
+    col1.write('Autore: Alberto Masini (2021); Licenza CC BY-NC-ND 3.0')
     col2.image('by-nc-nd.eu.png', width=60)
 
 
