@@ -32,24 +32,24 @@ def show_national_cases(national_data, start_date, stop_date, input_stop):
 
     # Compute the rolling means at 7 days
     average = util.compute_rollingmean(ratio)
-    average_hosp = util.compute_rollingmean(perc_delta_hospital)
-    average_icu = util.compute_rollingmean(perc_delta_icu)
+    average_hosp = util.compute_rollingmean(delta_hospital)
+    average_icu = util.compute_rollingmean(delta_icu)
     average_deaths = util.compute_rollingmean(delta_deaths)
 
     # Show the metrics of the last day, only if last day is today
     if input_stop == datetime.now().date():
         last_day = days[-1]
-        st.markdown(f'Numeri pi&ugrave recenti, relativi al '+last_day)
+        st.markdown(f'Dati pi&ugrave recenti, relativi al '+last_day)
         col1, col2, col3, col4 = st.columns(4)
-        col1.metric("Casi", util.mysign(delta_cases[-1])+str(delta_cases[-1]), str(round(ratio[-1],1))+'%', delta_color="inverse")
-        col2.metric("Ospedalizzati", util.mysign(delta_hospital[-1])+str(delta_hospital[-1]), str(round(perc_delta_hospital[-1],1))+'%', delta_color="inverse")
-        col3.metric("Terapie Intensive", util.mysign(delta_icu[-1])+str(delta_icu[-1]), str(round(perc_delta_icu[-1],1))+'%', delta_color="inverse")
-        col4.metric("Deceduti", util.mysign(delta_deaths[-1])+str(delta_deaths[-1]), delta_color="inverse")
+        col1.metric("Casi", numerize.numerize(int(cases[-1]), 3), util.mysign(delta_cases[-1])+str(delta_cases[-1])+' ('+str(round(ratio[-1],1))+'%)', delta_color="inverse")
+        col2.metric("Ospedalizzati", str(hospital[-1]), util.mysign(delta_hospital[-1])+str(delta_hospital[-1])+' ('+str(round(perc_delta_hospital[-1],1))+'%)', delta_color="inverse")
+        col3.metric("Terapie Intensive", str(icu[-1]), util.mysign(delta_icu[-1])+str(delta_icu[-1])+' ('+str(round(perc_delta_icu[-1],1))+'%)', delta_color="inverse")
+        col4.metric("Deceduti", str(deaths[-1]), util.mysign(delta_deaths[-1])+str(delta_deaths[-1]), delta_color="inverse")
 
     giorni0 = [datetime.strptime(giorno, "%d/%m/%Y").date() for giorno in days]
 
     # Plot the national cases
-    fig = plot.get_national_cases_fig(giorni0, ratio, average, perc_delta_hospital, average_hosp, perc_delta_icu, average_icu, delta_deaths, average_deaths)
+    fig = plot.get_national_cases_fig(giorni0, ratio, average, delta_hospital, average_hosp, delta_icu, average_icu, delta_deaths, average_deaths)
     st.plotly_chart(fig, use_container_width=True)
 
 
@@ -96,7 +96,7 @@ def show_local_cases(local_data, start_date, stop_date, input_stop):
     # Show the metrics of the last day, only if last day is today
     if input_stop == datetime.now().date():
         last_day = days[-1]
-        st.markdown(f'Numeri pi&ugrave recenti, relativi al ' + last_day)
+        st.markdown(f'Dati pi&ugrave recenti, relativi al ' + last_day)
         st.metric("Casi", numerize.numerize(int(cases[-1]), 1), util.mysign(delta_cases[-1]) + str(delta_cases[-1]),
                   delta_color="inverse")
 

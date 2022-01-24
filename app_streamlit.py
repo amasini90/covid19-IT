@@ -42,6 +42,24 @@ def main():
     except:
         pass
 
+    col1, col2, col3, col4 = st.columns(4)
+    
+    if col1.button('Ultimi 3 mesi'):
+        input_start = datetime.now().date()-timedelta(days=90)
+        input_stop = datetime.now().date()
+
+    if col2.button('Ultimi 6 mesi'):
+        input_start = datetime.now().date()-timedelta(days=180)
+        input_stop = datetime.now().date()
+
+    if col3.button('Ultimo anno'):
+        input_start = datetime.now().date()-timedelta(days=365)
+        input_stop = datetime.now().date()
+
+    if col4.button("Dall'inizio"):
+        input_start = datetime.strptime('01/03/2020', "%d/%m/%Y").date()
+        input_stop = datetime.now().date()
+
     # Load the data
     # TODO should first download and update this data and then read it
     local_data = util.get_data(local_data_path)
@@ -86,7 +104,8 @@ def main():
     st.write('Fonte dei dati: Presidenza del Consiglio dei Ministri - Dipartimento della Protezione Civile')
     st.write('Fonte popolazione province: https://www.tuttitalia.it/province/')
     col1, col2 = st.columns([2,1])
-    col1.write('Autore: Alberto Masini (2021); Licenza CC BY-NC-ND 3.0')
+    link = '[Alberto Masini](http://www.linkedin.com/in/almasini/)'
+    col1.write('Autore: '+link+' (2021); Licenza CC BY-NC-ND 3.0')
     col2.image('by-nc-nd.eu.png', width=60)
 
 

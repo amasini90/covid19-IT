@@ -5,17 +5,28 @@ import util
 
 
 def get_national_cases_fig(giorni0, ratio, average, perc_delta_hospital, average_hosp, perc_delta_icu, average_icu, delta_deaths, average_deaths):
-    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.02)
+    fig = make_subplots(rows=4, cols=1, shared_xaxes=True, vertical_spacing=0.02)
 
     fig.append_trace(go.Scatter(
         x=giorni0[1:],
         y=ratio,
         mode='lines',
         line=dict(color='lawngreen', width=1),
-        opacity=.5,
+        opacity=.0,
         showlegend=False,
         name='Tamponi positivi',
         legendgroup='1'
+        ),
+        row=1,
+        col=1
+    )
+
+    fig.append_trace(go.Bar(
+        x=giorni0[1:], 
+        y=ratio,
+        opacity=.2,
+        showlegend=False,
+        marker_color = 'lawngreen'
         ),
         row=1,
         col=1
@@ -38,10 +49,20 @@ def get_national_cases_fig(giorni0, ratio, average, perc_delta_hospital, average
         y=perc_delta_hospital,
         mode='lines',
         line=dict(color='turquoise', width=1),
-        opacity=.5,
+        opacity=.0,
         showlegend=False,
         name='Ricoverati',
         legendgroup='3'
+        ),
+        row=2,
+        col=1
+    )
+    fig.append_trace(go.Bar(
+        x=giorni0[1:], 
+        y=perc_delta_hospital,
+        opacity=.2,
+        showlegend=False,
+        marker_color = 'turquoise'
         ),
         row=2,
         col=1
@@ -64,14 +85,25 @@ def get_national_cases_fig(giorni0, ratio, average, perc_delta_hospital, average
         y=perc_delta_icu,
         mode='lines',
         line=dict(color='coral', width=1),
-        opacity=.5,
+        opacity=.0,
         showlegend=False,
         name='Terapie intensive',
         legendgroup='5'
         ),
-        row=2,
+        row=3,
         col=1
     )
+    fig.append_trace(go.Bar(
+        x=giorni0[1:], 
+        y=perc_delta_icu,
+        opacity=.2,
+        showlegend=False,
+        marker_color = 'coral'
+        ),
+        row=3,
+        col=1
+    )
+
     fig.append_trace(go.Scatter(
         x=giorni0[1:],
         y=average_icu,
@@ -80,7 +112,7 @@ def get_national_cases_fig(giorni0, ratio, average, perc_delta_hospital, average
         name='Terapie intensive',
         legendgroup='6'
         ),
-        row=2,
+        row=3,
         col=1
     )
 
@@ -89,12 +121,22 @@ def get_national_cases_fig(giorni0, ratio, average, perc_delta_hospital, average
         y=delta_deaths,
         mode='lines',
         line=dict(color='gold', width=1),
-        opacity=.5,
+        opacity=.0,
         showlegend=False,
-        name='Deceduti',
+        name='Decessi',
         legendgroup='7'
         ),
-        row=3,
+        row=4,
+        col=1
+    )
+    fig.append_trace(go.Bar(
+        x=giorni0[1:], 
+        y=delta_deaths,
+        opacity=.2,
+        showlegend=False,
+        marker_color = 'gold'
+        ),
+        row=4,
         col=1
     )
     fig.append_trace(go.Scatter(
@@ -102,20 +144,21 @@ def get_national_cases_fig(giorni0, ratio, average, perc_delta_hospital, average
         y=average_deaths,
         mode='lines',
         line=dict(color='gold', width=3),
-        name='Deceduti',
+        name='Decessi',
         legendgroup='8'
         ),
-        row=3,
+        row=4,
         col=1
     )
 
     fig.update_yaxes(title_text="Incremento casi (%)", row=1, col=1)
-    fig.update_yaxes(title_text="Variazione (%)", row=2, col=1)
-    fig.update_yaxes(title_text="Decessi", row=3, col=1)
-    fig.update_xaxes(title_text="Data", row=3, col=1)
+    fig.update_yaxes(title_text="Ricoveri", row=2, col=1)
+    fig.update_yaxes(title_text="TI", row=3, col=1)
+    fig.update_yaxes(title_text="Decessi", row=4, col=1)
+    fig.update_xaxes(title_text="Data", row=4, col=1)
 
     fig.update_layout(
-        height=600, width=600,
+        height=800, width=600,
         yaxis_rangemode="nonnegative",
         legend=dict(
             orientation="h",
@@ -148,8 +191,16 @@ def get_local_cases_fig(giorni0, where, average, local_data, start, stop, pop_df
         fig.add_trace(go.Scatter(x=giorni0[1:], y=average2, mode='lines', line=dict(color='mediumaquamarine', width=3),
                                  name=compare, legendgroup='3'))
     else:
+        fig.add_trace(go.Bar(
+        x=giorni0[1:], 
+        y=delta_casi_pertho,
+        opacity=.2,
+        showlegend=False,
+        marker_color = 'hotpink'
+        ),
+        )
         fig.add_trace(go.Scatter(x=giorni0[1:], y=delta_casi_pertho, mode='lines', line=dict(color='hotpink', width=1),
-                                 opacity=.5, showlegend=False, name='Tamponi positivi', legendgroup='1'))
+                                 opacity=.0, showlegend=False, name='Tamponi positivi', legendgroup='1'))
 
     fig.update_yaxes(title_text="Casi ogni 100mila abitanti")
     fig.update_xaxes(title_text="Data")
