@@ -42,21 +42,21 @@ def main():
     except:
         pass
 
-    col1, col2, col3, col4 = st.columns(4)
+    cola, colb, colc, cold = st.columns(4)
     
-    if col1.button('Ultimi 3 mesi'):
+    if cola.button('Ultimi 3 mesi'):
         input_start = datetime.now().date()-timedelta(days=90)
         input_stop = datetime.now().date()
 
-    if col2.button('Ultimi 6 mesi'):
+    if colb.button('Ultimi 6 mesi'):
         input_start = datetime.now().date()-timedelta(days=180)
         input_stop = datetime.now().date()
 
-    if col3.button('Ultimo anno'):
+    if colc.button('Ultimo anno'):
         input_start = datetime.now().date()-timedelta(days=365)
         input_stop = datetime.now().date()
 
-    if col4.button("Dall'inizio"):
+    if cold.button("Dall'inizio"):
         input_start = datetime.strptime('01/03/2020', "%d/%m/%Y").date()
         input_stop = datetime.now().date()
 
