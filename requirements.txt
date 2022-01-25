@@ -4,5 +4,3 @@ pandas
 matplotlib
 numerize
 plotly
-requests
-BeautifulSoup
