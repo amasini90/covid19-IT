@@ -42,7 +42,8 @@ def main():
     except:
         pass
 
-    cola, colb, colc, cold = st.columns(4)
+    cola, colb = st.columns(2)
+    colc, cold = st.columns(2)
     
     if cola.button('Ultimi 3 mesi'):
         input_start = datetime.now().date()-timedelta(days=90)
