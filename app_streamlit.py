@@ -42,6 +42,7 @@ def main():
     except:
         pass
 
+    '''
     cola, colb = st.columns(2)
     colc, cold = st.columns(2)
     
@@ -60,7 +61,7 @@ def main():
     if cold.button("Dall'inizio"):
         input_start = datetime.strptime('01/03/2020', "%d/%m/%Y").date()
         input_stop = datetime.now().date()
-
+    '''
     # Load the data
     # TODO should first download and update this data and then read it
     local_data = util.get_data(local_data_path)
