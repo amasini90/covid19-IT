@@ -42,26 +42,26 @@ def main():
     except:
         pass
 
-    '''
-    cola, colb = st.columns(2)
-    colc, cold = st.columns(2)
     
-    if cola.button('Ultimi 3 mesi'):
-        input_start = datetime.now().date()-timedelta(days=90)
-        input_stop = datetime.now().date()
+    #cola, colb = st.columns(2)
+    #colc, cold = st.columns(2)
+    
+    #if cola.button('Ultimi 3 mesi'):
+    #    input_start = datetime.now().date()-timedelta(days=90)
+    #    input_stop = datetime.now().date()
 
-    if colb.button('Ultimi 6 mesi'):
-        input_start = datetime.now().date()-timedelta(days=180)
-        input_stop = datetime.now().date()
+    #if colb.button('Ultimi 6 mesi'):
+    #    input_start = datetime.now().date()-timedelta(days=180)
+    #    input_stop = datetime.now().date()
 
-    if colc.button('Ultimo anno'):
-        input_start = datetime.now().date()-timedelta(days=365)
-        input_stop = datetime.now().date()
+    #if colc.button('Ultimo anno'):
+    #    input_start = datetime.now().date()-timedelta(days=365)
+    #    input_stop = datetime.now().date()
 
-    if cold.button("Dall'inizio"):
-        input_start = datetime.strptime('01/03/2020', "%d/%m/%Y").date()
-        input_stop = datetime.now().date()
-    '''
+    #if cold.button("Dall'inizio"):
+    #    input_start = datetime.strptime('01/03/2020', "%d/%m/%Y").date()
+    #    input_stop = datetime.now().date()
+    
     # Load the data
     # TODO should first download and update this data and then read it
     local_data = util.get_data(local_data_path)
