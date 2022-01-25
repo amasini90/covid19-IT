@@ -9,6 +9,8 @@ The app reads the data from the official GitHub of the Italian government and ni
 * Matplotlib (`pip install matplotlib`)
 * Numerize (`pip install numerize`)
 * Plotly (`pip install plotly`)
+* Requests (`pip install requests`)
+* BeautifulSoup (`pip install beautifulsoup4`)
 
 # Syntax and Usage
 The app is hosted at https://share.streamlit.io/amasini90/covid19-it/main/app_streamlit.py

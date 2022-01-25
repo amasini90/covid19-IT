@@ -14,6 +14,21 @@ def get_provinces():
     columns.pop(0) # remove index column
     return columns
 
+def get_pop():
+    import requests
+    from bs4 import BeautifulSoup
+
+    URL = "https://www.tuttitalia.it/province/"
+    page = requests.get(URL)
+    soup = BeautifulSoup(page.content, "html.parser")
+
+    results = soup.find_all("td", class_="oz")
+
+    pop = [0]
+    for i,item in enumerate(results):
+        if i%4 == 0:
+            pop.append(int(item.text.replace('.','')))
+    return pop
 
 def mysign(inp):
     if np.sign(inp) > 0:
