@@ -40,17 +40,17 @@ def show_national_cases(national_data, start_date, stop_date, input_stop):
     if input_stop == datetime.now().date():
         last_day = days[-1]
         st.markdown(f'Dati pi&ugrave recenti, relativi al '+last_day)
-        #col1, col2, col3, col4 = st.columns(4)
-        #col1.metric("Casi", numerize.numerize(int(cases[-1]), 2), util.mysign(delta_cases[-1])+str(delta_cases[-1])+' ('+str(round(ratio[-1],1))+'%)', delta_color="inverse")
-        #if delta_hospital[-1] != 0:
-        #    col2.metric("Ospedalizzati", str(hospital[-1]), util.mysign(delta_hospital[-1])+str(delta_hospital[-1])+' ('+str(round(perc_delta_hospital[-1],1))+'%)', delta_color="inverse")
-        #else:
-        #    col2.metric("Ospedalizzati", str(hospital[-1]), delta=None, delta_color="off")
-        #if delta_icu[-1] != 0:
-        #    col3.metric("Terapie Intensive", str(icu[-1]), util.mysign(delta_icu[-1])+str(delta_icu[-1])+' ('+str(round(perc_delta_icu[-1],1))+'%)', delta_color="inverse")
-        #else:
-        #    col3.metric("Terapie Intensive", str(icu[-1]), delta=None, delta_color="off")
-        #col4.metric("Deceduti", str(deaths[-1]), util.mysign(delta_deaths[-1])+str(delta_deaths[-1]), delta_color="inverse")
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Casi", numerize.numerize(int(cases[-1]), 2), util.mysign(delta_cases[-1])+str(delta_cases[-1])+' ('+str(round(ratio[-1],1))+'%)', delta_color="inverse")
+        if delta_hospital[-1] != 0:
+            col2.metric("Ospedalizzati", str(hospital[-1]), util.mysign(delta_hospital[-1])+str(delta_hospital[-1])+' ('+str(round(perc_delta_hospital[-1],1))+'%)', delta_color="inverse")
+        else:
+            col2.metric("Ospedalizzati", str(hospital[-1]), delta=None, delta_color="off")
+        if delta_icu[-1] != 0:
+            col3.metric("Terapie Intensive", str(icu[-1]), util.mysign(delta_icu[-1])+str(delta_icu[-1])+' ('+str(round(perc_delta_icu[-1],1))+'%)', delta_color="inverse")
+        else:
+            col3.metric("Terapie Intensive", str(icu[-1]), delta=None, delta_color="off")
+        col4.metric("Deceduti", str(deaths[-1]), util.mysign(delta_deaths[-1])+str(delta_deaths[-1]), delta_color="inverse")
 
     giorni0 = [datetime.strptime(giorno, "%d/%m/%Y").date() for giorno in days]
 
