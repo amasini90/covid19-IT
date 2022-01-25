@@ -4,3 +4,4 @@ pandas
 matplotlib
 numerize
 plotly
+bs4
