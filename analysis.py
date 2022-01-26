@@ -5,7 +5,7 @@ from numerize import numerize
 import pandas as pd
 
 
-def show_national_cases(national_data, start_date, stop_date, input_stop):
+def show_national_cases(national_data, start_date, stop_date):
 
     st.subheader('Situazione a livello nazionale')
 
@@ -37,7 +37,7 @@ def show_national_cases(national_data, start_date, stop_date, input_stop):
     average_deaths = util.compute_rollingmean(delta_deaths)
 
     # Show the metrics of the last day, only if last day is today
-    if input_stop == datetime.now().date():
+    if datetime.strptime(stop_date, "%d/%m/%Y").date() == datetime.now().date():
         last_day = days[-1]
         st.markdown(f'Dati pi&ugrave recenti, relativi al '+last_day)
         #col1, col2, col3, col4 = st.columns(4)
@@ -60,7 +60,7 @@ def show_national_cases(national_data, start_date, stop_date, input_stop):
     st.plotly_chart(fig, use_container_width=True)
 
 
-def show_local_cases(local_data, start_date, stop_date, input_stop):
+def show_local_cases(local_data, start_date, stop_date):
 
     st.subheader('Situazione a livello provinciale')
 
@@ -89,7 +89,7 @@ def show_local_cases(local_data, start_date, stop_date, input_stop):
     average = util.compute_rollingmean(delta_casi_pertho)
 
     # Show the metrics of the last day, only if last day is today
-    if input_stop == datetime.now().date():
+    if datetime.strptime(stop_date, "%d/%m/%Y").date() == datetime.now().date():
         last_day = days[-1]
         st.markdown(f'Dati pi&ugrave recenti, relativi al ' + last_day)
         st.metric("Casi", numerize.numerize(int(cases[-1]), 1), util.mysign(delta_cases[-1]) + str(delta_cases[-1]),
