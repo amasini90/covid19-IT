@@ -39,12 +39,12 @@ def main():
 
     try:
         input_start, input_stop = st.date_input('Periodo da visualizzare (default: ultimi 30 giorni)',
-                                           value=(input_start, input_stop),
-                                           min_value=datetime.strptime('01/03/2020', "%d/%m/%Y").date(),
-                                           max_value=datetime.now().date(),
-                                           key=None, help=None, on_change=None, args=None, kwargs=None)
-        st.session_state['inp_start'] = input_start
-        st.session_state['inp_stop'] = input_stop
+                                            value=(st.session_state.inp_start, st.session_state.inp_stop),
+                                            min_value=datetime.strptime('01/03/2020', "%d/%m/%Y").date(),
+                                            max_value=datetime.now().date(),
+                                            key=None, help=None, on_change=None, args=None, kwargs=None)
+        st.session_state.inp_start = input_start
+        st.session_state.inp_stop = input_stop
     except:
         pass
 
