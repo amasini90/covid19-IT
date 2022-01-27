@@ -38,13 +38,13 @@ def main():
         st.session_state['inp_stop'] = input_stop
 
     try:
+        st.session_state['inp_start'] = input_start
+        st.session_state['inp_stop'] = input_stop
         input_start, input_stop = st.date_input('Periodo da visualizzare (default: ultimi 30 giorni)',
                                             value=(st.session_state.inp_start, st.session_state.inp_stop),
                                             min_value=datetime.strptime('01/03/2020', "%d/%m/%Y").date(),
                                             max_value=datetime.now().date(),
                                             key=None, help=None, on_change=None, args=None, kwargs=None)
-        st.session_state.inp_start = input_start
-        st.session_state.inp_stop = input_stop
     except:
         pass
 
@@ -93,7 +93,7 @@ def main():
                           datetime.strptime(stop_date, "%d/%m/%Y").date()+timedelta(days=1),
                           timedelta(days=1)).astype(datetime)
 
-            for i, day in enumerate(t):
+            for day in t:
                 result = util.add_day(day)
 
                 if result == 0:
@@ -113,6 +113,8 @@ def main():
                 start_date = datetime.now().date()-timedelta(days=30)
                 start_date = start_date.strftime("%d/%m/%Y")
     
+    st.session_state['inp_start'] = datetime.strptime(start_date, "%d/%m/%Y").date()
+    st.session_state['inp_stop'] = datetime.strptime(stop_date, "%d/%m/%Y").date()
     analysis.show_national_cases(national_data, st.session_state.inp_start.strftime("%d/%m/%Y"), st.session_state.inp_stop.strftime("%d/%m/%Y"))
     analysis.show_local_cases(local_data, st.session_state.inp_start.strftime("%d/%m/%Y"), st.session_state.inp_stop.strftime("%d/%m/%Y"))
 
