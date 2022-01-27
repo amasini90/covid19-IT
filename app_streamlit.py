@@ -17,6 +17,10 @@ import util, analysis
 local_data_path = 'data/local_data.csv'
 national_data_path = 'data/national_data.csv'
 
+def date_callback(start,stop):
+    st.session_state['inp_start'] = start
+    st.session_state['inp_stop'] = stop
+
 def main():
     # Page configuration
     im = Image.open("virus.ico")
@@ -30,24 +34,27 @@ def main():
     
     ############################
     # Get start and stop dates - defaults to previous 30 days
-    input_start = datetime.now().date()-timedelta(days=30)
-    input_stop = datetime.now().date()
     # Initialization in Session State
     if 'inp_start' not in st.session_state:
+        input_start = datetime.now().date()-timedelta(days=30)
+        input_stop = datetime.now().date()
         st.session_state['inp_start'] = input_start
         st.session_state['inp_stop'] = input_stop
+    else:
+        input_start = st.session_state['inp_start']
+        input_stop = st.session_state['inp_stop']
 
-    try:
-        st.session_state['inp_start'] = input_start
-        st.session_state['inp_stop'] = input_stop
-        input_start, input_stop = st.date_input('Periodo da visualizzare (default: ultimi 30 giorni)',
-                                            value=(st.session_state.inp_start, st.session_state.inp_stop),
-                                            min_value=datetime.strptime('01/03/2020', "%d/%m/%Y").date(),
-                                            max_value=datetime.now().date(),
-                                            key=None, help=None, on_change=None, args=None, kwargs=None)
-    except:
-        pass
+    #try:
+    #    input_start, input_stop = st.date_input('Periodo da visualizzare (default: ultimi 30 giorni)',
+    #                                        value=(input_start.strftime("%d/%m/%Y"), input_stop.strftime("%d/%m/%Y")),
+    #                                        min_value=datetime.strptime('01/03/2020', "%d/%m/%Y").date(),
+    #                                        max_value=datetime.now().date(),
+    #                                        key=None, help=None, on_change=date_callback(), args=(input_start,input_stop), kwargs=None)
+    #except:
+    #   pass
 
+    #col1,col2 = st.columns(2)
+    #col3,col4 = st.columns(2)
     if st.button('Ultimi 3 mesi'):
         input_start = datetime.now().date()-timedelta(days=90)
         input_stop = datetime.now().date()
@@ -80,7 +87,7 @@ def main():
     # TODO should first download and update this data and then read it
     local_data = util.get_data(local_data_path)
     national_data = util.get_data(national_data_path)
-
+    last_date = national_data.index[-1]
     # Scrape missing national and local data from public GitHub repo, if available
     with st.spinner('Attendere...'):
         start_date = input_start.strftime("%d/%m/%Y")
@@ -115,8 +122,8 @@ def main():
     
     st.session_state['inp_start'] = datetime.strptime(start_date, "%d/%m/%Y").date()
     st.session_state['inp_stop'] = datetime.strptime(stop_date, "%d/%m/%Y").date()
-    analysis.show_national_cases(national_data, st.session_state.inp_start.strftime("%d/%m/%Y"), st.session_state.inp_stop.strftime("%d/%m/%Y"))
-    analysis.show_local_cases(local_data, st.session_state.inp_start.strftime("%d/%m/%Y"), st.session_state.inp_stop.strftime("%d/%m/%Y"))
+    analysis.show_national_cases(national_data, st.session_state.inp_start.strftime("%d/%m/%Y"), st.session_state.inp_stop.strftime("%d/%m/%Y"), last_date)
+    analysis.show_local_cases(local_data, st.session_state.inp_start.strftime("%d/%m/%Y"), st.session_state.inp_stop.strftime("%d/%m/%Y"), last_date)
 
     # Footer
     st.write('Fonte dei dati: Presidenza del Consiglio dei Ministri - Dipartimento della Protezione Civile')
