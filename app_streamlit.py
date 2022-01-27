@@ -55,33 +55,14 @@ def main():
 
     #col1,col2 = st.columns(2)
     #col3,col4 = st.columns(2)
-    if st.button('Ultimi 3 mesi'):
-        input_start = datetime.now().date()-timedelta(days=90)
-        input_stop = datetime.now().date()
+    delta = datetime.now().date()-datetime.strptime('01/03/2020',"%d/%m/%Y").date()
+    for what,when in zip(['Ultimi 3 mesi','Ultimi 6 mesi','Ultimo anno',"Dall'inizio"],[90,180,365,delta.days]):
+        if st.button(what):
+            input_start = datetime.now().date()-timedelta(days=when)
+            input_stop = datetime.now().date()
 
-        st.session_state['inp_start'] = input_start
-        st.session_state['inp_stop'] = input_stop
-
-    if st.button('Ultimi 6 mesi'):
-        input_start = datetime.now().date()-timedelta(days=180)
-        input_stop = datetime.now().date()
-
-        st.session_state['inp_start'] = input_start
-        st.session_state['inp_stop'] = input_stop
-
-    if st.button('Ultimo anno'):
-        input_start = datetime.now().date()-timedelta(days=365)
-        input_stop = datetime.now().date()
-
-        st.session_state['inp_start'] = input_start
-        st.session_state['inp_stop'] = input_stop
-
-    if st.button("Dall'inizio"):
-        input_start = datetime.strptime('01/03/2020', "%d/%m/%Y").date()
-        input_stop = datetime.now().date()
-
-        st.session_state['inp_start'] = input_start
-        st.session_state['inp_stop'] = input_stop
+            st.session_state['inp_start'] = input_start
+            st.session_state['inp_stop'] = input_stop
 
     # Load the data
     # TODO should first download and update this data and then read it
@@ -132,7 +113,6 @@ def main():
     link = '[Alberto Masini](http://www.linkedin.com/in/almasini/)'
     st.write('Autore: '+link+' (2021); Licenza CC BY-NC-ND 3.0')
     st.image('by-nc-nd.eu.png', width=60)
-
 
 if __name__ == '__main__':
     main()
