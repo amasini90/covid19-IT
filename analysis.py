@@ -39,7 +39,7 @@ def show_national_cases(national_data, start_date, stop_date, last_date):
     # Show the metrics of the last day, only if last day is today
     if stop_date == last_date:
         last_day = days[-1]
-        st.markdown(f'Dati pi&ugrave recenti, relativi al '+last_day)
+        st.markdown(f'Dati più recenti, relativi al '+last_day)
         #col1, col2, col3, col4 = st.columns(4)
         
         st.metric("Casi", numerize.numerize(int(cases[-1]), 2), util.mysign(delta_cases[-1])+str(delta_cases[-1])+' ('+str(round(ratio[-1],1))+'%)', delta_color="inverse")
