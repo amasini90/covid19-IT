@@ -2,17 +2,8 @@ import streamlit as st
 from streamlit import legacy_caching
 import numpy as np
 from datetime import datetime, timedelta
-from pandas.plotting import register_matplotlib_converters
-import matplotlib.dates as mdates
-from matplotlib import rc
 from PIL import Image
-register_matplotlib_converters()
-myFmt = mdates.DateFormatter('%d/%m')
-font = {'family' : 'serif'}
-rc('font', **font)
-
 import util, analysis
-
 
 local_data_path = 'data/local_data.csv'
 national_data_path = 'data/national_data.csv'
@@ -56,7 +47,7 @@ def main():
     #col1,col2 = st.columns(2)
     #col3,col4 = st.columns(2)
     delta = datetime.now().date()-datetime.strptime('01/03/2020',"%d/%m/%Y").date()
-    for what,when in zip(['Ultimi 3 mesi','Ultimi 6 mesi','Ultimo anno',"Dall'inizio"],[90,180,365,delta.days]):
+    for what,when in zip(['Ultimo mese','Ultimi 3 mesi','Ultimi 6 mesi','Ultimo anno',"Dall'inizio"],[30,90,180,365,delta.days]):
         if st.button(what):
             input_start = datetime.now().date()-timedelta(days=when)
             input_stop = datetime.now().date()
