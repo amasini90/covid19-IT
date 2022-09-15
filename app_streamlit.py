@@ -1,5 +1,5 @@
 import streamlit as st
-from streamlit import legacy_caching
+#from streamlit import legacy_caching
 import numpy as np
 from datetime import datetime, timedelta
 from PIL import Image
@@ -20,8 +20,8 @@ def main():
     # Title of the App
     st.title('Covid19 in Italia')
 
-    if st.button('Aggiorna'):
-        legacy_caching.clear_cache()
+    #if st.button('Aggiorna'):
+    #    legacy_caching.clear_cache()
     
     ############################
     # Get start and stop dates - defaults to previous 30 days
