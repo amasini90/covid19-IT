@@ -11,8 +11,9 @@ def get_data(data_path):
 def get_provinces():
     data = pd.read_csv('data/local_data.csv')
     columns = list(data.columns)
-    columns.pop(0) # remove index column
+    columns.pop(0)  # remove index column
     return columns
+
 
 def get_pop():
     import requests
@@ -25,10 +26,11 @@ def get_pop():
     results = soup.find_all("td", class_="oz")
 
     pop = [0]
-    for i,item in enumerate(results):
-        if i%4 == 0:
-            pop.append(int(item.text.replace('.','')))
+    for i, item in enumerate(results):
+        if i % 4 == 0:
+            pop.append(int(item.text.replace('.', '')))
     return pop
+
 
 def mysign(inp):
     if np.sign(inp) > 0:
@@ -94,4 +96,4 @@ def compute_rollingmean(quantity):
 
 
 def get_delta(mylist):
-    return np.array([mylist[i+1] - mylist[i] for i in range(len(mylist)-1)])
+    return np.array([mylist[i + 1] - mylist[i] for i in range(len(mylist) - 1)])
