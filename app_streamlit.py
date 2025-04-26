@@ -16,30 +16,32 @@ def main():
 
     # Title of the App
     st.title('Covid19 in Italia')
+    st.markdown("NOTA: Dall'8 Gennaio 2025 non sono più stati pubblicati dati relativi alla pandemia di Covid19 in Italia.")
 
     # Startup - update CSVs with most up-to-date data
-    update.update_at_startup()
+    #update.update_at_startup()  No more data published from January 8th 2025, no need to do that again
 
     # Read data
     national_data = util.get_data(national_data_path)
     local_data = util.get_data(local_data_path)
     last_date = national_data.index[-1]
+    last_date_dt = datetime.strptime(last_date, "%d/%m/%Y").date()
 
     ############################
-    # Get start and stop dates - defaults to previous 30 days
+    # Get start and stop dates - defaults to previous 365 days from last date in data
     # Initialization in Session State
     if 'inp_start' not in st.session_state:
-        input_start = datetime.now().date() - timedelta(days=30)
-        input_stop = datetime.now().date()
+        input_start = last_date_dt - timedelta(days=365)
+        input_stop = last_date_dt
         st.session_state['inp_start'] = input_start
         st.session_state['inp_stop'] = input_stop
 
-    from_start = datetime.now().date() - datetime.strptime('01/03/2020', "%d/%m/%Y").date()
-    for what, when in zip(['Ultimo mese', 'Ultimi 3 mesi', 'Ultimi 6 mesi', 'Ultimo anno', "Dall'inizio"],
-                          [30, 90, 180, 365, from_start.days]):
+    from_start = last_date_dt - datetime.strptime('01/03/2020', "%d/%m/%Y").date()
+    for what, when in zip(['Ultimo anno', "Dall'inizio"],
+                          [365, from_start.days]):
         if st.button(what):
-            input_start = datetime.now().date() - timedelta(days=when)
-            input_stop = datetime.now().date()
+            input_start = last_date_dt - timedelta(days=when)
+            input_stop = last_date_dt
 
             st.session_state['inp_start'] = input_start
             st.session_state['inp_stop'] = input_stop

@@ -72,11 +72,12 @@ def show_local_cases(local_data, start_date, stop_date, last_date):
     # Get the location for regional sub-area
     provinces_sorted = util.provinces.copy()
     provinces_sorted.sort()
-    provinces_sorted.insert(0, '')
+
     # Get population automatically
     pop = util.get_pop()
+
     pop_df = pd.DataFrame({'Provincia': provinces_sorted, 'Pop': pop})
-    province_to_visualize = st.selectbox('Provincia da visualizzare (default: Varese)', provinces_sorted, index=100,
+    province_to_visualize = st.selectbox('Provincia da visualizzare (default: Varese)', provinces_sorted, index=99,
                                          format_func=lambda x: 'Seleziona provincia' if x == '' else x)
     province_to_compare = st.selectbox('Compara con altra provincia?', provinces_sorted,
                                        format_func=lambda x: 'Seleziona provincia' if x == '' else x)

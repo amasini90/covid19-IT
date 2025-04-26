@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from urllib.error import HTTPError
-
+import streamlit as st
 
 def get_data(data_path):
     data = pd.read_csv(data_path)
@@ -16,19 +16,10 @@ def get_provinces():
 
 
 def get_pop():
-    import requests
-    from bs4 import BeautifulSoup
 
-    URL = "https://www.tuttitalia.it/province/"
-    page = requests.get(URL)
-    soup = BeautifulSoup(page.content, "html.parser")
+    pop_data = pd.read_csv("data/pop.csv")
+    pop = pop_data["popolazione"].apply(lambda x: int(x.replace(".","")[:-3]))
 
-    results = soup.find_all("td", class_="oz")
-
-    pop = [0]
-    for i, item in enumerate(results):
-        if i % 4 == 0:
-            pop.append(int(item.text.replace('.', '')))
     return pop
 
 
